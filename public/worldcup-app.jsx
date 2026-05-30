@@ -460,26 +460,16 @@ function WCApp({ mobile, dark, onThemeChange }) {
   // ── Channel badge — adapts to selected country ────────────────────────────────
   function ChannelBadge({ matchId }) {
     const ch = getChannel(matchId, country, channelMap);
-    if (country === 'is') {
-      // Iceland: show RÚV logo image
-      const logoFile = isDark ? 'ruv-dark.svg' : 'ruv-black.svg';
-      return (
-        <div style={S.evStation}>
-          <img src={`assets/logos/${logoFile}`} alt={ch}
-            style={{ height:16, width:'auto', maxWidth:48, display:'block' }}/>
-          <span style={{ fontSize:mobile?11:12, fontWeight:800, color:pal.muted,
-            letterSpacing:'0.04em', fontFamily:'"JetBrains Mono",monospace' }}>
-            {ch}
-          </span>
-        </div>
-      );
-    }
-    // Other countries: larger text badge
     return (
       <div style={S.evStation}>
-        <span style={{ fontSize:mobile?12:13, fontWeight:800, color:pal.badgeColor,
+        <span style={{
+          display:'inline-flex', alignItems:'center', justifyContent:'center',
+          padding:'5px 10px', borderRadius:8,
+          background:pal.accentSoft, border:`1px solid ${pal.badgeColor}`,
+          fontSize:mobile?13:14, fontWeight:800, color:pal.badgeColor,
           letterSpacing:'0.03em', fontFamily:'"JetBrains Mono",monospace',
-          textAlign:'center', lineHeight:1.3, whiteSpace:'nowrap' }}>
+          textAlign:'center', lineHeight:1.3, whiteSpace:'nowrap',
+        }}>
           {ch}
         </span>
       </div>
