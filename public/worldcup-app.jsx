@@ -370,7 +370,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
     // Layout
     body:{ flex:1, display:mobile?'block':'flex' },
-    livePane:{ width:320, flexShrink:0, borderRight:`1px solid ${pal.hair}`,
+    livePane:{ width:280, flexShrink:0, borderRight:`1px solid ${pal.hair}`,
       padding:'24px 20px', background:pal.panelBg,
       position:'sticky', top:0, maxHeight:'calc(100vh - 57px)', overflowY:'auto' },
     timeline:{ flex:1, padding:mobile?'0 0 48px':'0 0 48px', overflowY:'auto', minWidth:0 },
@@ -799,29 +799,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
               </>;
             })()}
 
-            {/* AD — 300×250 medium rectangle */}
-            <div style={{marginTop:24}}>
-              <div style={{fontSize:9,fontWeight:700,letterSpacing:'0.10em',color:pal.muted,
-                textTransform:'uppercase',marginBottom:6,textAlign:'center'}}>Advertisement</div>
-              <div style={{
-                width:300, height:250,
-                background: isDark ? '#2A2A2A' : '#E5E3DF',
-                border:`1px dashed ${pal.hair2}`,
-                borderRadius:8,
-                display:'flex', flexDirection:'column',
-                alignItems:'center', justifyContent:'center', gap:8,
-                color:pal.muted,
-              }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                  <rect x="3" y="5" width="18" height="14" rx="2"/>
-                  <path d="M3 9h18"/>
-                </svg>
-                <div style={{fontSize:11,fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase'}}>
-                  300 × 250
-                </div>
-                <div style={{fontSize:10,opacity:0.6}}>Google Ad</div>
-              </div>
-            </div>
           </div>
         )}
 
@@ -845,31 +822,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
         </div>
       </div>
 
-      {/* AD — sticky footer */}
-      <div style={{
-        position:'sticky', bottom:0, zIndex:40,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        padding: '8px 16px',
-        background: pal.bg,
-        borderTop: `1px solid ${pal.hair}`,
-      }}>
-        <div style={{
-          width: mobile ? 320 : 728,
-          height: mobile ? 50 : 90,
-          background: isDark ? '#2A2A2A' : '#E5E3DF',
-          border: `1px dashed ${pal.hair2}`,
-          borderRadius: 6,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          color: pal.muted, fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
-          textTransform: 'uppercase', flexShrink: 0,
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="3" y="5" width="18" height="14" rx="2"/>
-            <path d="M3 9h18"/>
-          </svg>
-          {mobile ? 'Advertisement · 320×50' : 'Advertisement · 728×90'}
-        </div>
-      </div>
     </div>
   );
 }
