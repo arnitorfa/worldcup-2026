@@ -33,3 +33,4 @@ api/
   events.js           # Vercel serverless — RÚV live schedule proxy
 vercel.json
 ```
+# worldcup
