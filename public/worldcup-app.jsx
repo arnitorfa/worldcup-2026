@@ -125,18 +125,42 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
-  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',       tz:'Atlantic/Reykjavik' },
-  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV', tz:'Europe/London' },
-  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4', tz:'Europe/Stockholm' },
-  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2',tz:'Europe/Oslo' },
-  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1', tz:'America/New_York' },
+  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',        tz:'Atlantic/Reykjavik' },
+  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
+  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
+  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',tz:'Europe/Madrid' },
+  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',  tz:'America/New_York' },
 ];
 
 // Per-match channel lookup. Keys = match.id.
-// IS determined dynamically from /api/events (channelMap state).
-// US: all matches on FOX/FS1 or Telemundo (handled in getChannel).
-// Sources: live-footballontv.com (UK), SVT/TV4 ICS calendar (SE), NRK/TV2 ICS calendar (NO).
+// IS: RÚV 2 matches listed; all others default to RÚV (+ dynamic /api/events override).
+// ES: La 1 for confirmed RTVE free matches; all others default to DAZN.
+// US: all matches on FOX/FS1 (handled in getChannel).
+// Sources: live-footballontv.com (UK), SVT/TV4 ICS (SE), NRK/TV2 ICS (NO),
+//          ruv.is schedule (IS), thelocal.es (ES).
 const CH = {
+  is: {
+    // Matches on RÚV 2 — all unlisted matches default to RÚV
+    1:'RÚV 2', 3:'RÚV 2', 5:'RÚV 2', 6:'RÚV 2', 9:'RÚV 2', 10:'RÚV 2',
+    14:'RÚV 2',15:'RÚV 2',17:'RÚV 2',18:'RÚV 2',21:'RÚV 2',22:'RÚV 2',
+    26:'RÚV 2',27:'RÚV 2',29:'RÚV 2',30:'RÚV 2',33:'RÚV 2',34:'RÚV 2',
+    38:'RÚV 2',39:'RÚV 2',41:'RÚV 2',42:'RÚV 2',45:'RÚV 2',46:'RÚV 2',
+    50:'RÚV 2',52:'RÚV 2',54:'RÚV 2',56:'RÚV 2',57:'RÚV 2',60:'RÚV 2',
+    62:'RÚV 2',64:'RÚV 2',66:'RÚV 2',68:'RÚV 2',70:'RÚV 2',72:'RÚV 2',
+    // Knockouts on RÚV 2
+    73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
+    82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  es: {
+    // RTVE La 1 — confirmed free-to-air (thelocal.es, May 2026)
+    1:'La 1', 3:'La 1', 6:'La 1', 9:'La 1', 13:'La 1', 17:'La 1',
+    22:'La 1',26:'La 1',29:'La 1',33:'La 1',37:'La 1',41:'La 1',
+    46:'La 1',51:'La 1',55:'La 1',63:'La 1',69:'La 1',
+    // Semis, 3rd place, final
+    101:'La 1',102:'La 1',103:'La 1',104:'La 1',
+    // All other matches → DAZN (default in getChannel)
+  },
   uk: {
     1:'ITV',  2:'ITV',  3:'BBC',  4:'BBC',  5:'ITV',  6:'BBC',
     7:'BBC',  8:'ITV',  9:'ITV',  10:'ITV', 11:'BBC', 12:'ITV',
@@ -198,8 +222,9 @@ const CH = {
 };
 
 function getChannel(matchId, country, channelMap) {
-  if (country === 'is') return channelMap[matchId] || 'RÚV';
+  if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'es') return CH.es?.[matchId] || 'DAZN';
   if (country === 'uk' && (matchId >= 73)) return 'BBC / ITV';
   return CH[country]?.[matchId] || '–';
 }
@@ -375,10 +400,12 @@ function WCApp({ mobile, dark, onThemeChange }) {
       position:'sticky', top:0, maxHeight:'calc(100vh - 57px)', overflowY:'auto' },
     timeline:{ flex:1, padding:mobile?'0 0 48px':'0 0 48px', overflowY:'auto', minWidth:0 },
 
-    // Date header — same style as main app
-    dateHdr:{ fontSize:11, fontWeight:700, letterSpacing:'0.10em',
-      color:pal.muted, textTransform:'capitalize',
-      padding:mobile?'20px 16px 0':'22px 32px 0' },
+    // Date header
+    dateHdr:{ fontSize:mobile?15:17, fontWeight:800, letterSpacing:'-0.01em',
+      color:pal.fg, textTransform:'capitalize',
+      padding:mobile?'24px 16px 10px':'28px 32px 12px',
+      borderBottom:`1px solid ${pal.hair}`,
+      marginBottom:0 },
 
     // ── EVENT CARD — matches main app row style (screenshot) ──────────────────
     // Each card: hairline separator like main timeline
@@ -811,10 +838,11 @@ function WCApp({ mobile, dark, onThemeChange }) {
           <div style={{textAlign:'center',marginTop:32,color:pal.muted,fontSize:11,padding:mobile?'0 16px 16px':'0 32px 16px'}}>
             {(() => {
               const c = COUNTRIES.find(x=>x.code===country);
-              if (country==='is') return 'RÚV holds broadcast rights to all 104 matches of the 2026 World Cup';
+              if (country==='is') return 'RÚV and RÚV 2 hold broadcast rights to all 104 matches of the 2026 World Cup';
               if (country==='uk') return 'BBC and ITV share rights to all 104 matches in the United Kingdom';
               if (country==='se') return 'SVT and TV4 share rights to all 104 matches in Sweden';
               if (country==='no') return 'NRK and TV 2 share rights to all 104 matches in Norway';
+              if (country==='es') return 'RTVE (La 1) shows ~20 matches free-to-air including all Spain games. DAZN broadcasts all 104 matches.';
               if (country==='us') return 'FOX/FS1 (English) and Telemundo (Spanish) broadcast all 104 matches in the United States';
               return '';
             })()}
