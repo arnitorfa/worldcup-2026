@@ -430,9 +430,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     countrySel:{ height:36, padding:'0 10px', borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`, color:pal.fg,
       fontSize:13, fontFamily:'inherit', fontWeight:600, flexShrink:0,
-      outline:'none', appearance:'none', WebkitAppearance:'none',
-      paddingRight:28, backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23${isDark?'9CA3AF':'6B7280'}' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")`,
-      backgroundRepeat:'no-repeat', backgroundPosition:'right 10px center' },
+      outline:'none' },
 
     // Live pane
     liveHd:{ display:'flex', alignItems:'center', gap:8, marginBottom:16 },
@@ -654,18 +652,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
             <div style={{fontSize:10,color:pal.muted,letterSpacing:'0.10em',marginTop:4}}>11 JUN – 19 JUL · USA / CANADA / MEXICO</div>
           </div>
         )}
-        {/* Country selector */}
-        <select
-          style={S.countrySel}
-          value={country}
-          onChange={e => handleCountry(e.target.value)}
-          title="Select country"
-        >
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
-
         <div style={{...S.searchWrap}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
             <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
@@ -680,6 +666,17 @@ function WCApp({ mobile, dark, onThemeChange }) {
             ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
             : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
         </button>
+        {/* Country selector — far right */}
+        <select
+          style={S.countrySel}
+          value={country}
+          onChange={e => handleCountry(e.target.value)}
+          title="Select country"
+        >
+          {COUNTRIES.map(c => (
+            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* LIVE BANNER */}
