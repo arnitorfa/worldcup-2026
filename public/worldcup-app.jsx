@@ -350,7 +350,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     // Group bar
     groupBar:{ display:'flex', alignItems:'center',
       padding:mobile?'8px 12px':'10px 24px',
-      borderBottom:`1px solid ${pal.hair}`, gap:4, overflowX:'auto', scrollbarWidth:'none' },
+      borderBottom:`1px solid ${pal.hair}`, gap:4,
+      flexWrap: mobile?'wrap':'nowrap',
+      overflowX: mobile?'visible':'auto', scrollbarWidth:'none' },
     groupLabel:{ fontSize:9.5, fontWeight:800, letterSpacing:'0.14em',
       color:pal.muted, textTransform:'uppercase', flexShrink:0, marginRight:4 },
     groupChip:(a) => ({ minWidth:mobile?36:40, height:mobile?36:40, borderRadius:10,
