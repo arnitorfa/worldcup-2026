@@ -1,0 +1,12 @@
+{
+  "outputDirectory": "public",
+  "functions": {
+    "api/events.js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/api/events", "destination": "/api/events" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

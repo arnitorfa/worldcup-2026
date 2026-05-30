@@ -1,0 +1,10 @@
+{
+  "name": "ithrottir-framundan",
+  "version": "1.0.0",
+  "description": "Icelandic sports TV schedule — sport.torfason.is",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
