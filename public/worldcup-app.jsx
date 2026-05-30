@@ -311,10 +311,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
     root:{ minHeight:'100vh', background:pal.bg, color:pal.fg,
       fontFamily:'"Inter",system-ui,sans-serif', letterSpacing:'-0.005em',
       display:'flex', flexDirection:'column' },
-    topBar:{ display:'flex', alignItems:'center', gap:mobile?10:20,
-      padding:mobile?'12px 16px':'18px 32px',
+    topBar:{ display:'flex', flexDirection: mobile?'column':'row', alignItems: mobile?'stretch':'center',
+      gap: mobile?8:20,
+      padding:mobile?'10px 16px':'18px 32px',
       borderBottom:`1px solid ${pal.hair}`,
       position:'sticky', top:0, zIndex:50, background:pal.bg },
+    topRow:{ display:'flex', alignItems:'center', gap:10 },
+    bottomRow:{ display:'flex', alignItems:'center', gap:8 },
     iconBtn:{ width:38, height:38, borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`,
       color:pal.fg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
@@ -379,9 +382,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     // Each card: hairline separator like main timeline
     evRow:{ borderBottom:`1px solid ${pal.hair}`, padding:mobile?'14px 16px':'16px 32px' },
 
-    // 4-column grid: [time] [icon-box] [content] [station]
+    // grid: mobile = [time] [content] [station], desktop = [time] [icon] [content] [station]
     evGrid:{ display:'grid',
-      gridTemplateColumns:mobile?'68px 48px 1fr auto':'80px 52px 1fr auto',
+      gridTemplateColumns:mobile?'68px 1fr auto':'80px 52px 1fr auto',
       gap:mobile?'0 10px':'0 14px',
       alignItems:'center' },
 
@@ -493,10 +496,12 @@ function WCApp({ mobile, dark, onThemeChange }) {
             <span style={S.evTimeEnd}>to {end}</span>
           </div>
 
-          {/* ICON */}
-          <div style={S.evIcon}>
-            <SportIcon id="fb" size={mobile?24:28} strokeWidth={1.4} />
-          </div>
+          {/* ICON — desktop only */}
+          {!mobile && (
+            <div style={S.evIcon}>
+              <SportIcon id="fb" size={28} strokeWidth={1.4} />
+            </div>
+          )}
 
           {/* CONTENT */}
           <div style={S.evContent}>
@@ -642,41 +647,75 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
       {/* TOP BAR */}
       <div style={S.topBar}>
-        <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
-          <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
-            style={{height:26,width:'auto',display:'block'}}/>
-        </div>
-        {!mobile && (
+        {mobile ? (<>
+          {/* Mobile row 1: logo + country */}
+          <div style={S.topRow}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:24,width:'auto',display:'block'}}/>
+            <div style={{flex:1}}/>
+            <select
+              style={S.countrySel}
+              value={country}
+              onChange={e => handleCountry(e.target.value)}
+              title="Select country"
+            >
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+              ))}
+            </select>
+          </div>
+          {/* Mobile row 2: search + theme toggle */}
+          <div style={S.bottomRow}>
+            <div style={{...S.searchWrap, maxWidth:'none', marginLeft:0, flex:1}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+              </svg>
+              <input style={S.searchInput} placeholder="Search teams, venues…"
+                value={search} onChange={e => setSearch(e.target.value)}/>
+              {search && <button onClick={() => setSearch('')}
+                style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+            </div>
+            <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+              {isDark
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+            </button>
+          </div>
+        </>) : (<>
+          {/* Desktop: single row */}
+          <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:26,width:'auto',display:'block'}}/>
+          </div>
           <div>
             <div style={{fontWeight:800,fontSize:18,letterSpacing:'-0.02em',lineHeight:1}}>FIFA World Cup 2026</div>
             <div style={{fontSize:10,color:pal.muted,letterSpacing:'0.10em',marginTop:4}}>11 JUN – 19 JUL · USA / CANADA / MEXICO</div>
           </div>
-        )}
-        <div style={{...S.searchWrap}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
-          </svg>
-          <input style={S.searchInput} placeholder="Search teams, venues…"
-            value={search} onChange={e => setSearch(e.target.value)}/>
-          {search && <button onClick={() => setSearch('')}
-            style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
-        </div>
-        <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
-          {isDark
-            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-            : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
-        </button>
-        {/* Country selector — far right */}
-        <select
-          style={S.countrySel}
-          value={country}
-          onChange={e => handleCountry(e.target.value)}
-          title="Select country"
-        >
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
+          <div style={{...S.searchWrap}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <input style={S.searchInput} placeholder="Search teams, venues…"
+              value={search} onChange={e => setSearch(e.target.value)}/>
+            {search && <button onClick={() => setSearch('')}
+              style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+          </div>
+          <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+            {isDark
+              ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+          </button>
+          <select
+            style={S.countrySel}
+            value={country}
+            onChange={e => handleCountry(e.target.value)}
+            title="Select country"
+          >
+            {COUNTRIES.map(c => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        </>)}
       </div>
 
       {/* LIVE BANNER */}
@@ -721,7 +760,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
       {tab==='group' && !searchRes && (
         <div style={S.groupBar} data-sh>
           <button style={S.allarChip(group==='ALL')} onClick={() => setGroup('ALL')}>ALL GROUPS</button>
-          <span style={S.groupLabel}>GROUPS:</span>
+          {!mobile && <span style={S.groupLabel}>GROUPS:</span>}
           {GROUPS.map(g => (
             <button key={g} style={S.groupChip(group===g && group!=='ALL')} onClick={() => setGroup(g)}>{g}</button>
           ))}
