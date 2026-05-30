@@ -720,6 +720,31 @@ function WCApp({ mobile, dark, onThemeChange }) {
         </>)}
       </div>
 
+      {/* AD — leaderboard below topBar */}
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center',
+        padding: mobile ? '8px 16px' : '10px 32px',
+        borderBottom:`1px solid ${pal.hair}`,
+        background: pal.panelBg,
+      }}>
+        <div style={{
+          width: mobile ? 320 : 728,
+          height: mobile ? 50 : 90,
+          background: isDark ? '#2A2A2A' : '#E5E3DF',
+          border: `1px dashed ${pal.hair2}`,
+          borderRadius: 6,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          color: pal.muted, fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
+          textTransform: 'uppercase', flexShrink: 0,
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="M3 9h18"/>
+          </svg>
+          {mobile ? 'Advertisement · 320×50' : 'Advertisement · 728×90'}
+        </div>
+      </div>
+
       {/* LIVE BANNER */}
       {liveMs.length > 0 && (
         <div style={{background:'rgba(255,59,71,0.10)',borderBottom:'1px solid rgba(255,59,71,0.25)',
@@ -818,6 +843,32 @@ function WCApp({ mobile, dark, onThemeChange }) {
               return '';
             })()}
           </div>
+        </div>
+      </div>
+
+      {/* AD — sticky footer */}
+      <div style={{
+        position:'sticky', bottom:0, zIndex:40,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        padding: '8px 16px',
+        background: pal.bg,
+        borderTop: `1px solid ${pal.hair}`,
+      }}>
+        <div style={{
+          width: mobile ? 320 : 728,
+          height: mobile ? 50 : 90,
+          background: isDark ? '#2A2A2A' : '#E5E3DF',
+          border: `1px dashed ${pal.hair2}`,
+          borderRadius: 6,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          color: pal.muted, fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
+          textTransform: 'uppercase', flexShrink: 0,
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="M3 9h18"/>
+          </svg>
+          {mobile ? 'Advertisement · 320×50' : 'Advertisement · 728×90'}
         </div>
       </div>
     </div>
