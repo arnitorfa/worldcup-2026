@@ -620,12 +620,17 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
     const byDate = {};
     matches.forEach(m => { const d=isoDay(m.iso,tz); if(!byDate[d])byDate[d]=[]; byDate[d].push(m); });
-    return Object.entries(byDate).sort().map(([d,arr]) => (
-      <div key={d}>
-        <div style={S.dateHdr}>{fmtDay(arr[0].iso,tz)}</div>
-        {arr.map(m => <MatchCard key={m.id} match={m}/>)}
-      </div>
-    ));
+    return Object.entries(byDate).sort().map(([d,arr]) => {
+      arr.sort((a,b) => a.iso.localeCompare(b.iso));
+      // Use the earliest match in the group to label the date header (correct local date)
+      const firstByLocalTime = arr.reduce((a,b) => new Date(a.iso) < new Date(b.iso) ? a : b);
+      return (
+        <div key={d}>
+          <div style={S.dateHdr}>{fmtDay(firstByLocalTime.iso,tz)}</div>
+          {arr.map(m => <MatchCard key={m.id} match={m}/>)}
+        </div>
+      );
+    });
   }
 
   // ── Views ─────────────────────────────────────────────────────────────────────
