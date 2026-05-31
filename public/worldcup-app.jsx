@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',          tz:'Europe/Copenhagen' },
   { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',         tz:'Europe/Berlin' },
   { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports', tz:'Europe/Paris' },
   { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',      tz:'Europe/Madrid' },
@@ -153,6 +154,19 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  dk: {
+    // TV 2 group matches (source: sportportalen.dk / TV2.dk / DR.dk)
+    1:'TV 2', 2:'TV 2', 4:'TV 2', 6:'TV 2', 10:'TV 2', 13:'TV 2',
+    14:'TV 2',18:'TV 2',19:'TV 2',20:'TV 2',21:'TV 2',22:'TV 2',
+    24:'TV 2',28:'TV 2',32:'TV 2',36:'TV 2',37:'TV 2',38:'TV 2',
+    53:'TV 2',54:'TV 2',
+    // DR group matches
+    3:'DR',  5:'DR',  7:'DR',  8:'DR',  9:'DR',  11:'DR',
+    12:'DR', 15:'DR', 16:'DR', 17:'DR', 23:'DR', 25:'DR',
+    26:'DR', 27:'DR', 29:'DR', 30:'DR', 31:'DR', 33:'DR',
+    34:'DR', 35:'DR',
+    // Matchday 3 & knockouts: channel TBD → fallback to "DR / TV 2"
   },
   de: {
     // ARD group matches
@@ -259,6 +273,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
   if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
   if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
