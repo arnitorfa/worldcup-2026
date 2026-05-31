@@ -1,14 +1,46 @@
 <!doctype html>
-<html lang="en">
+<html lang="is">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 — SportZone</title>
-<meta name="description" content="Schedule of all 104 FIFA World Cup 2026 matches. Mexico, USA and Canada, 11 June – 19 July 2026. TV listings for Iceland, UK, Sweden, Norway and USA." />
-<meta property="og:title" content="FIFA World Cup 2026 — SportZone" />
-<meta property="og:description" content="All 104 FIFA World Cup 2026 matches — local kick-off times and TV channels for your country." />
-<meta property="og:locale" content="en_GB" />
+<title>SportZone — Íþróttir í beinni á íslensku sjónvarpi</title>
+<meta name="description" content="Yfirlit yfir íþróttir í beinni útsendingu á RÚV, Sýn Sport, Síminn Sport, Viaplay og Lívey. Fylgstu með fótbolta, körfubolta, handbolta, íshokkí, golf, tennis og fleira." />
+<meta name="keywords" content="íþróttir í beinni, íslenskt sjónvarp, RÚV sport, Sýn Sport, Síminn Sport, Viaplay Ísland, Lívey, fótbolti í beinni, íshokkí, handbolti, körfubolti, golf, tennis, dagskrá" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://sportzone.is/" />
+
+<!-- Open Graph (Facebook, WhatsApp, Slack o.fl.) -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://sportzone.is/" />
+<meta property="og:title" content="SportZone — Íþróttir í beinni á íslensku sjónvarpi" />
+<meta property="og:description" content="Yfirlit yfir íþróttir í beinni á RÚV, Sýn Sport, Síminn Sport, Viaplay og Lívey — allt á einum stað." />
+<meta property="og:locale" content="is_IS" />
 <meta property="og:site_name" content="SportZone" />
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="SportZone — Íþróttir í beinni" />
+<meta name="twitter:description" content="Allar íþróttir í beinni á íslensku sjónvarpi — RÚV, Sýn Sport, Viaplay og Lívey." />
+
+<!-- Structured data (Google & AI leitarvélar) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SportZone",
+  "url": "https://sportzone.is",
+  "description": "Yfirlit yfir íþróttir í beinni útsendingu á íslensku sjónvarpi. Sýnir dagskrá RÚV, Sýn Sport, Síminn Sport, Viaplay og Lívey á einum stað.",
+  "applicationCategory": "SportsApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "is",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ISK" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SportZone",
+    "url": "https://sportzone.is"
+  }
+}
+</script>
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -21,11 +53,17 @@
   html, body { height: 100%; margin: 0; }
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    background: #222222;
+    background: #08080A;
     color: #F4F4F5;
     overflow-x: hidden;
   }
-  #root { width: 1300px; margin: 0 auto; min-height: 100%; }
+  /* Desktop: fixed-width centred layout */
+  #root {
+    width: 1300px;
+    margin: 0 auto;
+    min-height: 100%;
+  }
+  /* Mobile: full-width, no horizontal scroll */
   @media (max-width: 767px) {
     body { overflow-x: hidden; }
     #root { width: 100%; }
@@ -39,7 +77,11 @@
     background: rgba(127,127,127,0.25); border-radius: 99px;
     border: 2px solid transparent; background-clip: padding-box;
   }
+  ::-webkit-scrollbar-thumb:hover { background-color: rgba(127,127,127,0.4); }
 </style>
+
+<!-- Umami analytics — privacy-friendly, no cookies -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="db18a23e-4e1d-4f59-93a0-0431a17828fd"></script>
 </head>
 <body>
 <div id="root"></div>
@@ -48,11 +90,18 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
+<!-- Supabase JS client (loaded synchronously so it's ready when components init) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="data.js"></script>
 <script type="text/babel" src="components.jsx"></script>
-<script type="text/babel" src="worldcup-app.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+<script type="text/babel" src="mobile-app.jsx"></script>
 
 <script type="text/babel" data-presets="react">
+// ── Root: routes between desktop and mobile layouts ───────────────────────────
+// Detection runs once on load — no mid-session switching.
+// Three independent signals: UA, viewport width (CSS pixels), pointer type.
+// Any one being true is enough to go mobile.
 function isMobileDevice() {
   const byUA = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
   const byWidth = window.innerWidth < 768;
@@ -62,8 +111,11 @@ function isMobileDevice() {
 
 const THEME_KEY = 'if_v2_theme';
 
-function WCRoot() {
+function Root() {
   const mobile = React.useMemo(() => isMobileDevice(), []);
+
+  // Shared theme state (mobile uses it directly; desktop App manages its own
+  // but reads the same localStorage key on init, so they stay in sync).
   const [dark, setDark] = React.useState(() => {
     try {
       const saved = localStorage.getItem(THEME_KEY);
@@ -71,14 +123,19 @@ function WCRoot() {
     } catch (e) {}
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+
   const handleTheme = (isDark) => {
     setDark(isDark);
     try { localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); } catch (e) {}
   };
-  return <WCApp mobile={mobile} dark={dark} onThemeChange={handleTheme} />;
+
+  if (mobile) {
+    return <MobileApp dark={dark} onThemeChange={handleTheme} />;
+  }
+  return <App />;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<WCRoot />);
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
 </script>
 </body>
 </html>

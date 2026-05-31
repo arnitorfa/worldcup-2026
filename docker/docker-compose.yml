@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  ithrottir:
+    build:
+      context: ..              # repo root — so fetchers/ and public/ are accessible
+      dockerfile: docker/Dockerfile
+    container_name: ithrottir-framundan
+    restart: unless-stopped
+    ports:
+      - "3000:3000"            # Change left side to use another port on the NAS
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

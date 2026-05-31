@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIFA World Cup 2026 — SportZone</title>
+<meta name="description" content="Schedule of all 104 FIFA World Cup 2026 matches. Mexico, USA and Canada, 11 June – 19 July 2026. TV listings for Iceland, UK, Sweden, Norway and USA." />
+<meta property="og:title" content="FIFA World Cup 2026 — SportZone" />
+<meta property="og:description" content="All 104 FIFA World Cup 2026 matches — local kick-off times and TV channels for your country." />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:site_name" content="SportZone" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #222222;
+    color: #F4F4F5;
+    overflow-x: hidden;
+  }
+  #root { width: 1300px; margin: 0 auto; min-height: 100%; }
+  @media (max-width: 767px) {
+    body { overflow-x: hidden; }
+    #root { width: 100%; }
+  }
+  * { box-sizing: border-box; }
+  input { font-family: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(127,127,127,0.25); border-radius: 99px;
+    border: 2px solid transparent; background-clip: padding-box;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="worldcup-app.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+function isMobileDevice() {
+  const byUA = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+  const byWidth = window.innerWidth < 768;
+  const byPointer = window.matchMedia('(pointer: coarse)').matches;
+  return byUA || byWidth || byPointer;
+}
+
+const THEME_KEY = 'if_v2_theme';
+
+function WCRoot() {
+  const mobile = React.useMemo(() => isMobileDevice(), []);
+  const [dark, setDark] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved !== null) return saved === 'dark';
+    } catch (e) {}
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  const handleTheme = (isDark) => {
+    setDark(isDark);
+    try { localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); } catch (e) {}
+  };
+  return <WCApp mobile={mobile} dark={dark} onThemeChange={handleTheme} />;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<WCRoot />);
+</script>
+</body>
+</html>
