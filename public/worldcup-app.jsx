@@ -129,8 +129,9 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
-  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',tz:'Europe/Madrid' },
-  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',  tz:'America/New_York' },
+  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports', tz:'Europe/Paris' },
+  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',      tz:'Europe/Madrid' },
+  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',         tz:'America/New_York' },
 ];
 
 // Per-match channel lookup. Keys = match.id.
@@ -151,6 +152,19 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  fr: {
+    // Group stage — M6
+    1:'M6',  3:'M6',  5:'M6',  6:'M6',  9:'M6',  10:'M6', 13:'M6', 14:'M6',
+    15:'M6', 17:'M6', 18:'M6', 21:'M6', 22:'M6', 25:'M6', 26:'M6', 29:'M6',
+    30:'M6', 33:'M6', 34:'M6', 37:'M6', 38:'M6', 41:'M6', 42:'M6', 45:'M6',
+    46:'M6', 49:'M6', 51:'M6', 55:'M6', 57:'M6', 61:'M6', 67:'M6', 69:'M6',
+    // Knockouts — M6
+    73:'M6', 74:'M6', 76:'M6', 77:'M6', 78:'M6', 80:'M6', 84:'M6', 87:'M6', 88:'M6',
+    89:'M6', 90:'M6', 91:'M6', 93:'M6', 95:'M6', 96:'M6',
+    97:'M6', 98:'M6', 99:'M6',
+    101:'M6',102:'M6',103:'M6',104:'M6',
+    // All other matches → beIN Sports (default in getChannel)
   },
   es: {
     // RTVE La 1 — confirmed free-to-air (thelocal.es, May 2026)
@@ -224,6 +238,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
   if (country === 'uk' && (matchId >= 73)) return 'BBC / ITV';
   return CH[country]?.[matchId] || '–';
