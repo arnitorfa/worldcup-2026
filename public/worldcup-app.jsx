@@ -125,47 +125,41 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
-  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',            tz:'Atlantic/Reykjavik' },
-  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',      tz:'Europe/London' },
-  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',      tz:'Europe/Stockholm' },
-  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2',     tz:'Europe/Oslo' },
-  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports',tz:'Europe/Paris' },
-  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',    tz:'Europe/Madrid' },
-  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',       tz:'America/New_York' },
+  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',        tz:'Atlantic/Reykjavik' },
+  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
+  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
+  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',tz:'Europe/Madrid' },
+  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',  tz:'America/New_York' },
 ];
 
 // Per-match channel lookup. Keys = match.id.
-// IS determined dynamically from /api/events (channelMap state), CH.is = static fallback.
+// IS: RÚV 2 matches listed; all others default to RÚV (+ dynamic /api/events override).
+// ES: La 1 for confirmed RTVE free matches; all others default to DAZN.
 // US: all matches on FOX/FS1 (handled in getChannel).
-// Sources: live-footballontv.com (UK), SVT/TV4 ICS (SE), NRK/TV2 ICS (NO), footao.tv (FR), rtve.es (ES), ruv.is (IS).
+// Sources: live-footballontv.com (UK), SVT/TV4 ICS (SE), NRK/TV2 ICS (NO),
+//          ruv.is schedule (IS), thelocal.es (ES).
 const CH = {
   is: {
+    // Matches on RÚV 2 — all unlisted matches default to RÚV
     1:'RÚV 2', 3:'RÚV 2', 5:'RÚV 2', 6:'RÚV 2', 9:'RÚV 2', 10:'RÚV 2',
     14:'RÚV 2',15:'RÚV 2',17:'RÚV 2',18:'RÚV 2',21:'RÚV 2',22:'RÚV 2',
     26:'RÚV 2',27:'RÚV 2',29:'RÚV 2',30:'RÚV 2',33:'RÚV 2',34:'RÚV 2',
     38:'RÚV 2',39:'RÚV 2',41:'RÚV 2',42:'RÚV 2',45:'RÚV 2',46:'RÚV 2',
     50:'RÚV 2',52:'RÚV 2',54:'RÚV 2',56:'RÚV 2',57:'RÚV 2',60:'RÚV 2',
     62:'RÚV 2',64:'RÚV 2',66:'RÚV 2',68:'RÚV 2',70:'RÚV 2',72:'RÚV 2',
+    // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
   },
-  fr: {
-    // Group stage — M6
-    1:'M6',  3:'M6',  5:'M6',  6:'M6',  9:'M6',  10:'M6', 13:'M6', 14:'M6',
-    15:'M6', 17:'M6', 18:'M6', 21:'M6', 22:'M6', 25:'M6', 26:'M6', 29:'M6',
-    30:'M6', 33:'M6', 34:'M6', 37:'M6', 38:'M6', 41:'M6', 42:'M6', 45:'M6',
-    46:'M6', 49:'M6', 51:'M6', 55:'M6', 57:'M6', 61:'M6', 67:'M6', 69:'M6',
-    // Knockouts — M6
-    73:'M6', 74:'M6', 76:'M6', 77:'M6', 78:'M6', 80:'M6', 84:'M6', 87:'M6', 88:'M6',
-    89:'M6', 90:'M6', 91:'M6', 93:'M6', 95:'M6', 96:'M6',
-    97:'M6', 98:'M6', 99:'M6',
-    101:'M6',102:'M6',103:'M6',104:'M6',
-  },
   es: {
+    // RTVE La 1 — confirmed free-to-air (thelocal.es, May 2026)
     1:'La 1', 3:'La 1', 6:'La 1', 9:'La 1', 13:'La 1', 17:'La 1',
     22:'La 1',26:'La 1',29:'La 1',33:'La 1',37:'La 1',41:'La 1',
     46:'La 1',51:'La 1',55:'La 1',63:'La 1',69:'La 1',
+    // Semis, 3rd place, final
     101:'La 1',102:'La 1',103:'La 1',104:'La 1',
+    // All other matches → DAZN (default in getChannel)
   },
   uk: {
     1:'ITV',  2:'ITV',  3:'BBC',  4:'BBC',  5:'ITV',  6:'BBC',
@@ -230,7 +224,6 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
-  if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
   if (country === 'uk' && (matchId >= 73)) return 'BBC / ITV';
   return CH[country]?.[matchId] || '–';
@@ -343,10 +336,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
     root:{ minHeight:'100vh', background:pal.bg, color:pal.fg,
       fontFamily:'"Inter",system-ui,sans-serif', letterSpacing:'-0.005em',
       display:'flex', flexDirection:'column' },
-    topBar:{ display:'flex', alignItems:'center', gap:mobile?10:20,
-      padding:mobile?'12px 16px':'18px 32px',
+    topBar:{ display:'flex', flexDirection: mobile?'column':'row', alignItems: mobile?'stretch':'center',
+      gap: mobile?8:20,
+      padding:mobile?'10px 16px':'18px 32px',
       borderBottom:`1px solid ${pal.hair}`,
       position:'sticky', top:0, zIndex:50, background:pal.bg },
+    topRow:{ display:'flex', alignItems:'center', gap:10 },
+    bottomRow:{ display:'flex', alignItems:'center', gap:8 },
     iconBtn:{ width:38, height:38, borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`,
       color:pal.fg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
@@ -379,7 +375,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     // Group bar
     groupBar:{ display:'flex', alignItems:'center',
       padding:mobile?'8px 12px':'10px 24px',
-      borderBottom:`1px solid ${pal.hair}`, gap:4, overflowX:'auto', scrollbarWidth:'none' },
+      borderBottom:`1px solid ${pal.hair}`, gap:4,
+      flexWrap: mobile?'wrap':'nowrap',
+      overflowX: mobile?'visible':'auto', scrollbarWidth:'none' },
     groupLabel:{ fontSize:9.5, fontWeight:800, letterSpacing:'0.14em',
       color:pal.muted, textTransform:'uppercase', flexShrink:0, marginRight:4 },
     groupChip:(a) => ({ minWidth:mobile?36:40, height:mobile?36:40, borderRadius:10,
@@ -402,18 +400,20 @@ function WCApp({ mobile, dark, onThemeChange }) {
       position:'sticky', top:0, maxHeight:'calc(100vh - 57px)', overflowY:'auto' },
     timeline:{ flex:1, padding:mobile?'0 0 48px':'0 0 48px', overflowY:'auto', minWidth:0 },
 
-    // Date header — same style as main app
-    dateHdr:{ fontSize:11, fontWeight:700, letterSpacing:'0.10em',
-      color:pal.muted, textTransform:'capitalize',
-      padding:mobile?'20px 16px 0':'22px 32px 0' },
+    // Date header
+    dateHdr:{ fontSize:mobile?15:17, fontWeight:800, letterSpacing:'-0.01em',
+      color:pal.fg, textTransform:'capitalize',
+      padding:mobile?'24px 16px 10px':'28px 32px 12px',
+      borderBottom:`1px solid ${pal.hair}`,
+      marginBottom:0 },
 
     // ── EVENT CARD — matches main app row style (screenshot) ──────────────────
     // Each card: hairline separator like main timeline
     evRow:{ borderBottom:`1px solid ${pal.hair}`, padding:mobile?'14px 16px':'16px 32px' },
 
-    // 4-column grid: [time] [icon-box] [content] [station]
+    // grid: mobile = [time] [content] [station], desktop = [time] [icon] [content] [station]
     evGrid:{ display:'grid',
-      gridTemplateColumns:mobile?'68px 48px 1fr auto':'80px 52px 1fr auto',
+      gridTemplateColumns:mobile?'68px 1fr auto':'80px 52px 1fr auto',
       gap:mobile?'0 10px':'0 14px',
       alignItems:'center' },
 
@@ -462,9 +462,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     countrySel:{ height:36, padding:'0 10px', borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`, color:pal.fg,
       fontSize:13, fontFamily:'inherit', fontWeight:600, flexShrink:0,
-      outline:'none', appearance:'none', WebkitAppearance:'none',
-      paddingRight:28, backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23${isDark?'9CA3AF':'6B7280'}' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")`,
-      backgroundRepeat:'no-repeat', backgroundPosition:'right 10px center' },
+      outline:'none' },
 
     // Live pane
     liveHd:{ display:'flex', alignItems:'center', gap:8, marginBottom:16 },
@@ -527,10 +525,12 @@ function WCApp({ mobile, dark, onThemeChange }) {
             <span style={S.evTimeEnd}>to {end}</span>
           </div>
 
-          {/* ICON */}
-          <div style={S.evIcon}>
-            <SportIcon id="fb" size={mobile?24:28} strokeWidth={1.4} />
-          </div>
+          {/* ICON — desktop only */}
+          {!mobile && (
+            <div style={S.evIcon}>
+              <SportIcon id="fb" size={28} strokeWidth={1.4} />
+            </div>
+          )}
 
           {/* CONTENT */}
           <div style={S.evContent}>
@@ -676,44 +676,75 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
       {/* TOP BAR */}
       <div style={S.topBar}>
-        <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
-          <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
-            style={{height:26,width:'auto',display:'block'}}/>
-          {!mobile && <a href="/" style={S.backBtn}>← Main site</a>}
-        </div>
-        {!mobile && (
+        {mobile ? (<>
+          {/* Mobile row 1: logo + country */}
+          <div style={S.topRow}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:24,width:'auto',display:'block'}}/>
+            <div style={{flex:1}}/>
+            <select
+              style={S.countrySel}
+              value={country}
+              onChange={e => handleCountry(e.target.value)}
+              title="Select country"
+            >
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+              ))}
+            </select>
+          </div>
+          {/* Mobile row 2: search + theme toggle */}
+          <div style={S.bottomRow}>
+            <div style={{...S.searchWrap, maxWidth:'none', marginLeft:0, flex:1}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+              </svg>
+              <input style={S.searchInput} placeholder="Search teams, venues…"
+                value={search} onChange={e => setSearch(e.target.value)}/>
+              {search && <button onClick={() => setSearch('')}
+                style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+            </div>
+            <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+              {isDark
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+            </button>
+          </div>
+        </>) : (<>
+          {/* Desktop: single row */}
+          <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:26,width:'auto',display:'block'}}/>
+          </div>
           <div>
             <div style={{fontWeight:800,fontSize:18,letterSpacing:'-0.02em',lineHeight:1}}>FIFA World Cup 2026</div>
             <div style={{fontSize:10,color:pal.muted,letterSpacing:'0.10em',marginTop:4}}>11 JUN – 19 JUL · USA / CANADA / MEXICO</div>
           </div>
-        )}
-        {/* Country selector */}
-        <select
-          style={S.countrySel}
-          value={country}
-          onChange={e => handleCountry(e.target.value)}
-          title="Select country"
-        >
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
-
-        <div style={{...S.searchWrap}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
-          </svg>
-          <input style={S.searchInput} placeholder="Search teams, venues…"
-            value={search} onChange={e => setSearch(e.target.value)}/>
-          {search && <button onClick={() => setSearch('')}
-            style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
-        </div>
-        <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
-          {isDark
-            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-            : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
-        </button>
-        {mobile && <a href="/" style={{...S.iconBtn,textDecoration:'none',fontSize:14}}>←</a>}
+          <div style={{...S.searchWrap}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <input style={S.searchInput} placeholder="Search teams, venues…"
+              value={search} onChange={e => setSearch(e.target.value)}/>
+            {search && <button onClick={() => setSearch('')}
+              style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+          </div>
+          <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+            {isDark
+              ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+          </button>
+          <select
+            style={S.countrySel}
+            value={country}
+            onChange={e => handleCountry(e.target.value)}
+            title="Select country"
+          >
+            {COUNTRIES.map(c => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        </>)}
       </div>
 
       {/* LIVE BANNER */}
@@ -758,7 +789,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
       {tab==='group' && !searchRes && (
         <div style={S.groupBar} data-sh>
           <button style={S.allarChip(group==='ALL')} onClick={() => setGroup('ALL')}>ALL GROUPS</button>
-          <span style={S.groupLabel}>GROUPS:</span>
+          {!mobile && <span style={S.groupLabel}>GROUPS:</span>}
           {GROUPS.map(g => (
             <button key={g} style={S.groupChip(group===g && group!=='ALL')} onClick={() => setGroup(g)}>{g}</button>
           ))}
@@ -794,6 +825,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
                 ))}
               </>;
             })()}
+
           </div>
         )}
 
@@ -806,16 +838,18 @@ function WCApp({ mobile, dark, onThemeChange }) {
           <div style={{textAlign:'center',marginTop:32,color:pal.muted,fontSize:11,padding:mobile?'0 16px 16px':'0 32px 16px'}}>
             {(() => {
               const c = COUNTRIES.find(x=>x.code===country);
-              if (country==='is') return 'RÚV holds broadcast rights to all 104 matches of the 2026 World Cup';
+              if (country==='is') return 'RÚV and RÚV 2 hold broadcast rights to all 104 matches of the 2026 World Cup';
               if (country==='uk') return 'BBC and ITV share rights to all 104 matches in the United Kingdom';
               if (country==='se') return 'SVT and TV4 share rights to all 104 matches in Sweden';
               if (country==='no') return 'NRK and TV 2 share rights to all 104 matches in Norway';
+              if (country==='es') return 'RTVE (La 1) shows ~20 matches free-to-air including all Spain games. DAZN broadcasts all 104 matches.';
               if (country==='us') return 'FOX/FS1 (English) and Telemundo (Spanish) broadcast all 104 matches in the United States';
               return '';
             })()}
           </div>
         </div>
       </div>
+
     </div>
   );
 }
