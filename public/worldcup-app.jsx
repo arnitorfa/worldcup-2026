@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',         tz:'Europe/Berlin' },
   { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports', tz:'Europe/Paris' },
   { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',      tz:'Europe/Madrid' },
   { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',         tz:'America/New_York' },
@@ -152,6 +153,26 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  de: {
+    // ARD group matches
+    3:'ARD',  7:'ARD',  9:'ARD',  13:'ARD', 14:'ARD', 19:'ARD',
+    29:'ARD', 31:'ARD', 39:'ARD', 41:'ARD', 42:'ARD', 45:'ARD',
+    46:'ARD', 48:'ARD', 55:'ARD', 57:'ARD', 61:'ARD', 64:'ARD',
+    // ZDF group matches (incl. opening)
+    1:'ZDF',  5:'ZDF',  6:'ZDF',  15:'ZDF', 16:'ZDF', 20:'ZDF',
+    21:'ZDF', 22:'ZDF', 25:'ZDF', 27:'ZDF', 33:'ZDF', 34:'ZDF',
+    35:'ZDF', 38:'ZDF', 44:'ZDF', 68:'ZDF',
+    // ZDF: Round of 32 + QF + Final
+    73:'ZDF', 74:'ZDF', 75:'ZDF', 76:'ZDF', 77:'ZDF', 78:'ZDF',
+    79:'ZDF', 80:'ZDF', 81:'ZDF', 82:'ZDF', 83:'ZDF', 84:'ZDF',
+    85:'ZDF', 86:'ZDF', 87:'ZDF', 88:'ZDF',
+    97:'ZDF', 98:'ZDF', 99:'ZDF', 100:'ZDF',
+    104:'ZDF',
+    // ARD: R16 + SF
+    89:'ARD', 90:'ARD', 91:'ARD', 92:'ARD', 93:'ARD', 94:'ARD', 95:'ARD', 96:'ARD',
+    101:'ARD',102:'ARD',
+    // Match 103 (3rd place) → MagentaTV (default)
   },
   fr: {
     // Group stage — M6
@@ -238,6 +259,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
   if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
   if (country === 'uk' && (matchId >= 73)) return 'BBC / ITV';
