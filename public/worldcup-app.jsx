@@ -125,6 +125,8 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
+  { code:'ar', flag:'🇦🇷', name:'Argentina',       station:'Telefe / TyC Sports',   tz:'America/Argentina/Buenos_Aires' },
+  { code:'br', flag:'🇧🇷', name:'Brazil',          station:'Globo / CazéTV',         tz:'America/Sao_Paulo' },
   { code:'ca', flag:'🇨🇦', name:'Canada',          station:'CTV / TSN',             tz:'America/Toronto' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',             tz:'Europe/Copenhagen' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',             tz:'Europe/Helsinki' },
@@ -153,6 +155,11 @@ const TZ_TO_COUNTRY = {
   'Europe/Madrid':'es', 'Africa/Ceuta':'es', 'Atlantic/Canary':'es',
   'Europe/Rome':'it', 'Europe/Vatican':'it', 'Europe/San_Marino':'it',
   'Europe/Lisbon':'pt', 'Atlantic/Azores':'pt', 'Atlantic/Madeira':'pt',
+  'America/Argentina/Buenos_Aires':'ar','America/Argentina/Cordoba':'ar',
+  'America/Argentina/Mendoza':'ar','America/Argentina/Salta':'ar',
+  'America/Sao_Paulo':'br','America/Manaus':'br','America/Belem':'br',
+  'America/Fortaleza':'br','America/Recife':'br','America/Maceio':'br',
+  'America/Bahia':'br','America/Cuiaba':'br','America/Porto_Velho':'br',
   'America/Toronto':'ca', 'America/Vancouver':'ca', 'America/Winnipeg':'ca',
   'America/Edmonton':'ca', 'America/Halifax':'ca', 'America/St_Johns':'ca',
   'America/Regina':'ca', 'America/Whitehorse':'ca', 'America/Yellowknife':'ca',
@@ -185,6 +192,23 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  ar: {
+    // Telefe (free TV, 30 matches) — Argentina games + opener + big matches
+    // Argentina group matches: 19 (vs Algeria), 41 (vs Austria), 71 (Jordan vs Argentina)
+    // Source: lanacion.com.ar / minutouno.com
+    1:'Telefe',
+    19:'Telefe', 41:'Telefe', 71:'Telefe',
+    // SF + Final → TV Pública + Telefe
+    101:'TV Pública',102:'TV Pública',103:'TV Pública',104:'TV Pública',
+    // All other matches → TyC Sports (default)
+  },
+  br: {
+    // Globo (free TV, 52 matches) — Brazil games + final confirmed
+    // Brazil group matches: 6 (vs Morocco), 31 (vs Haiti), 51 (Scotland vs Brazil)
+    // Source: mancheteesportiva.com.br / lance.com.br
+    6:'Globo', 31:'Globo', 51:'Globo', 104:'Globo',
+    // All other matches → CazéTV (YouTube, free, all 104) as default
   },
   ca: {
     // CTV (free over-air) matches — source: tsn.ca official broadcast schedule
@@ -363,6 +387,8 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'ar') return CH.ar?.[matchId] || 'TyC Sports';
+  if (country === 'br') return CH.br?.[matchId] || 'CazéTV';
   if (country === 'ca') return CH.ca?.[matchId] || 'TSN';
   if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
   if (country === 'it') return CH.it?.[matchId] || 'DAZN';
