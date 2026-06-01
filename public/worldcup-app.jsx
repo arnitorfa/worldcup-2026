@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'pt', flag:'🇵🇹', name:'Portugal',         station:'Sport TV / LiveModeTV', tz:'Europe/Lisbon' },
   { code:'it', flag:'🇮🇹', name:'Italy',            station:'Rai 1 / DAZN',        tz:'Europe/Rome' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',           tz:'Europe/Helsinki' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',          tz:'Europe/Copenhagen' },
@@ -156,6 +157,17 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  pt: {
+    // Portugal games — free-to-air (RTP / SIC / TVI, exact channel TBD)
+    21:'RTP/SIC/TVI', 45:'RTP/SIC/TVI', 69:'RTP/SIC/TVI',
+    // LiveModeTV (free YouTube) matches — source: magazine-hd.com
+    1:'LiveModeTV', 3:'LiveModeTV', 6:'LiveModeTV', 9:'LiveModeTV',
+    13:'LiveModeTV',17:'LiveModeTV',26:'LiveModeTV',31:'LiveModeTV',
+    34:'LiveModeTV',37:'LiveModeTV',41:'LiveModeTV',51:'LiveModeTV',
+    55:'LiveModeTV',61:'LiveModeTV',
+    101:'LiveModeTV',102:'LiveModeTV',104:'LiveModeTV',
+    // All other matches → Sport TV (subscription)
   },
   it: {
     // Rai 1 matches — source: affaritaliani.it (35 partite in chiaro, all on Rai 1)
@@ -306,6 +318,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
   if (country === 'it') return CH.it?.[matchId] || 'DAZN';
   if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
   if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
