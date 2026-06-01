@@ -143,6 +143,7 @@ const COUNTRIES = [
   { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',           tz:'Europe/Madrid' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',             tz:'Europe/Stockholm' },
   { code:'ch', flag:'🇨🇭', name:'Switzerland',     station:'SRF / RTS / RSI',       tz:'Europe/Zurich' },
+  { code:'tr', flag:'🇹🇷', name:'Turkey',          station:'TRT Spor',              tz:'Europe/Istanbul' },
   { code:'uk', flag:'🇬🇧', name:'United Kingdom',  station:'BBC / ITV',             tz:'Europe/London' },
   { code:'us', flag:'🇺🇸', name:'United States',   station:'FOX / FS1',             tz:'America/New_York' },
 ];
@@ -164,6 +165,7 @@ const TZ_TO_COUNTRY = {
   'Europe/Zagreb':'hr',
   'Europe/Budapest':'hu',
   'Europe/Zurich':'ch',
+  'Europe/Istanbul':'tr',
   'America/Mexico_City':'mx','America/Monterrey':'mx','America/Merida':'mx',
   'America/Mazatlan':'mx','America/Chihuahua':'mx','America/Hermosillo':'mx',
   'America/Argentina/Buenos_Aires':'ar','America/Argentina/Cordoba':'ar',
@@ -415,6 +417,7 @@ function getChannel(matchId, country, channelMap) {
   if (country === 'hu') return 'M4 Sport';
   if (country === 'mx') return CH.mx?.[matchId] || 'TUDN / ViX';
   if (country === 'ch') return 'SRF / RTS / RSI';
+  if (country === 'tr') return 'TRT Spor';
   if (country === 'br') return CH.br?.[matchId] || 'CazéTV';
   if (country === 'ca') return CH.ca?.[matchId] || 'TSN';
   if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
