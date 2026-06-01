@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'ca', flag:'🇨🇦', name:'Canada',           station:'CTV / TSN',             tz:'America/Toronto' },
   { code:'pt', flag:'🇵🇹', name:'Portugal',         station:'Sport TV / LiveModeTV', tz:'Europe/Lisbon' },
   { code:'it', flag:'🇮🇹', name:'Italy',            station:'Rai 1 / DAZN',        tz:'Europe/Rome' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',           tz:'Europe/Helsinki' },
@@ -157,6 +158,23 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  ca: {
+    // CTV (free over-air) matches — source: tsn.ca official broadcast schedule
+    // Group stage
+    1:'CTV',  3:'CTV',  4:'CTV',  5:'CTV',  6:'CTV',  7:'CTV',
+    8:'CTV',  9:'CTV',  10:'CTV', 21:'CTV', 22:'CTV', 23:'CTV',
+    27:'CTV', 33:'CTV', 34:'CTV', 35:'CTV', 37:'CTV', 38:'CTV',
+    39:'CTV', 40:'CTV', 47:'CTV', 49:'CTV', 62:'CTV', 65:'CTV',
+    67:'CTV', 69:'CTV', 71:'CTV',
+    // R32
+    73:'CTV', 80:'CTV', 81:'CTV', 82:'CTV', 83:'CTV', 85:'CTV',
+    // R16
+    89:'CTV', 90:'CTV', 91:'CTV', 96:'CTV',
+    // QF + SF + Final
+    97:'CTV', 98:'CTV', 99:'CTV', 100:'CTV',
+    101:'CTV',102:'CTV',104:'CTV',
+    // All other matches → TSN (subscription)
   },
   pt: {
     // Portugal games — free-to-air (RTP / SIC / TVI, exact channel TBD)
@@ -318,6 +336,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'ca') return CH.ca?.[matchId] || 'TSN';
   if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
   if (country === 'it') return CH.it?.[matchId] || 'DAZN';
   if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
