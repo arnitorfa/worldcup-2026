@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',           tz:'Europe/Helsinki' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',          tz:'Europe/Copenhagen' },
   { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',         tz:'Europe/Berlin' },
   { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports', tz:'Europe/Paris' },
@@ -154,6 +155,21 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  fi: {
+    // Yle (TV2/Areena) matches — source: yle.fi/a/74-20218518 (complete official schedule)
+    // Group stage
+    3:'Yle',  4:'Yle',  9:'Yle',  10:'Yle', 11:'Yle', 12:'Yle',
+    17:'Yle', 18:'Yle', 19:'Yle', 20:'Yle', 25:'Yle', 26:'Yle',
+    27:'Yle', 28:'Yle', 33:'Yle', 34:'Yle', 35:'Yle', 36:'Yle',
+    41:'Yle', 42:'Yle', 43:'Yle', 44:'Yle', 49:'Yle', 50:'Yle',
+    51:'Yle', 52:'Yle', 53:'Yle', 54:'Yle', 61:'Yle', 62:'Yle',
+    63:'Yle', 64:'Yle', 65:'Yle', 66:'Yle', 71:'Yle', 72:'Yle',
+    // Knockouts
+    73:'Yle', 75:'Yle', 77:'Yle', 78:'Yle', 79:'Yle', 83:'Yle',
+    84:'Yle', 85:'Yle', 91:'Yle', 92:'Yle', 95:'Yle', 96:'Yle',
+    97:'Yle', 99:'Yle', 101:'Yle', 104:'Yle',
+    // All other matches → MTV (default in getChannel)
   },
   dk: {
     // TV 2 group matches (source: sportportalen.dk / TV2.dk / DR.dk)
@@ -273,6 +289,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
   if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
   if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
   if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
