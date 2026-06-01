@@ -126,7 +126,12 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
   { code:'ar', flag:'🇦🇷', name:'Argentina',       station:'Telefe / TyC Sports',   tz:'America/Argentina/Buenos_Aires' },
+  { code:'be', flag:'🇧🇪', name:'Belgium',         station:'Sporza / RTBF',          tz:'Europe/Brussels' },
   { code:'br', flag:'🇧🇷', name:'Brazil',          station:'Globo / CazéTV',         tz:'America/Sao_Paulo' },
+  { code:'hr', flag:'🇭🇷', name:'Croatia',         station:'HRT',                    tz:'Europe/Zagreb' },
+  { code:'hu', flag:'🇭🇺', name:'Hungary',         station:'M4 Sport',               tz:'Europe/Budapest' },
+  { code:'mx', flag:'🇲🇽', name:'Mexico',          station:'Azteca 7 / TUDN',        tz:'America/Mexico_City' },
+  { code:'ch', flag:'🇨🇭', name:'Switzerland',     station:'SRF / RTS / RSI',        tz:'Europe/Zurich' },
   { code:'ca', flag:'🇨🇦', name:'Canada',          station:'CTV / TSN',             tz:'America/Toronto' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',             tz:'Europe/Copenhagen' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',             tz:'Europe/Helsinki' },
@@ -155,6 +160,12 @@ const TZ_TO_COUNTRY = {
   'Europe/Madrid':'es', 'Africa/Ceuta':'es', 'Atlantic/Canary':'es',
   'Europe/Rome':'it', 'Europe/Vatican':'it', 'Europe/San_Marino':'it',
   'Europe/Lisbon':'pt', 'Atlantic/Azores':'pt', 'Atlantic/Madeira':'pt',
+  'Europe/Brussels':'be',
+  'Europe/Zagreb':'hr',
+  'Europe/Budapest':'hu',
+  'Europe/Zurich':'ch',
+  'America/Mexico_City':'mx','America/Monterrey':'mx','America/Merida':'mx',
+  'America/Mazatlan':'mx','America/Chihuahua':'mx','America/Hermosillo':'mx',
   'America/Argentina/Buenos_Aires':'ar','America/Argentina/Cordoba':'ar',
   'America/Argentina/Mendoza':'ar','America/Argentina/Salta':'ar',
   'America/Sao_Paulo':'br','America/Manaus':'br','America/Belem':'br',
@@ -192,6 +203,17 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  mx: {
+    // Azteca 7 (free TV, 32 matches) — source: tvazteca.com official schedule
+    // Group stage — confirmed Azteca 7
+    1:'Azteca 7', 4:'Azteca 7', 6:'Azteca 7', 10:'Azteca 7', 19:'Azteca 7',
+    22:'Azteca 7',28:'Azteca 7',31:'Azteca 7',33:'Azteca 7',37:'Azteca 7',
+    43:'Azteca 7',48:'Azteca 7',53:'Azteca 7',55:'Azteca 7',63:'Azteca 7',
+    67:'Azteca 7',69:'Azteca 7',
+    // SF + Final confirmed on Azteca 7
+    101:'Azteca 7',102:'Azteca 7',104:'Azteca 7',
+    // All other matches → TUDN / ViX
   },
   ar: {
     // Telefe (free TV, 30 matches) — Argentina games + opener + big matches
@@ -388,6 +410,11 @@ function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
   if (country === 'ar') return CH.ar?.[matchId] || 'TyC Sports';
+  if (country === 'be') return 'Sporza';
+  if (country === 'hr') return 'HRT';
+  if (country === 'hu') return 'M4 Sport';
+  if (country === 'mx') return CH.mx?.[matchId] || 'TUDN / ViX';
+  if (country === 'ch') return 'SRF / RTS / RSI';
   if (country === 'br') return CH.br?.[matchId] || 'CazéTV';
   if (country === 'ca') return CH.ca?.[matchId] || 'TSN';
   if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
