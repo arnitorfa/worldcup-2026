@@ -129,6 +129,7 @@ const COUNTRIES = [
   { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
   { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
   { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
+  { code:'it', flag:'🇮🇹', name:'Italy',            station:'Rai 1 / DAZN',        tz:'Europe/Rome' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',           tz:'Europe/Helsinki' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',          tz:'Europe/Copenhagen' },
   { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',         tz:'Europe/Berlin' },
@@ -155,6 +156,22 @@ const CH = {
     // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  it: {
+    // Rai 1 matches — source: affaritaliani.it (35 partite in chiaro, all on Rai 1)
+    // Group stage
+    1:'Rai 1', 3:'Rai 1', 6:'Rai 1', 10:'Rai 1', 14:'Rai 1', 17:'Rai 1',
+    22:'Rai 1',26:'Rai 1',29:'Rai 1',34:'Rai 1',37:'Rai 1',38:'Rai 1',
+    41:'Rai 1',46:'Rai 1',49:'Rai 1',55:'Rai 1',61:'Rai 1',67:'Rai 1',68:'Rai 1',
+    // R32
+    73:'Rai 1',74:'Rai 1',77:'Rai 1',82:'Rai 1',84:'Rai 1',88:'Rai 1',
+    // R16
+    90:'Rai 1',91:'Rai 1',93:'Rai 1',96:'Rai 1',
+    // QF
+    97:'Rai 1',98:'Rai 1',99:'Rai 1',100:'Rai 1',
+    // SF + Finals
+    101:'Rai 1',102:'Rai 1',103:'Rai 1',104:'Rai 1',
+    // All other matches → DAZN (default)
   },
   fi: {
     // Yle (TV2/Areena) matches — source: yle.fi/a/74-20218518 (complete official schedule)
@@ -289,6 +306,7 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'it') return CH.it?.[matchId] || 'DAZN';
   if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
   if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
   if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
