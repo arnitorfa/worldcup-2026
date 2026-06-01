@@ -125,20 +125,47 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
-  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',        tz:'Atlantic/Reykjavik' },
-  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',  tz:'Europe/London' },
-  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',  tz:'Europe/Stockholm' },
-  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2', tz:'Europe/Oslo' },
-  { code:'ca', flag:'🇨🇦', name:'Canada',           station:'CTV / TSN',             tz:'America/Toronto' },
-  { code:'pt', flag:'🇵🇹', name:'Portugal',         station:'Sport TV / LiveModeTV', tz:'Europe/Lisbon' },
-  { code:'it', flag:'🇮🇹', name:'Italy',            station:'Rai 1 / DAZN',        tz:'Europe/Rome' },
-  { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',           tz:'Europe/Helsinki' },
-  { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',          tz:'Europe/Copenhagen' },
-  { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',         tz:'Europe/Berlin' },
-  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports', tz:'Europe/Paris' },
-  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',      tz:'Europe/Madrid' },
-  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',         tz:'America/New_York' },
+  { code:'ca', flag:'🇨🇦', name:'Canada',          station:'CTV / TSN',             tz:'America/Toronto' },
+  { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',             tz:'Europe/Copenhagen' },
+  { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',             tz:'Europe/Helsinki' },
+  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports',      tz:'Europe/Paris' },
+  { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',             tz:'Europe/Berlin' },
+  { code:'is', flag:'🇮🇸', name:'Iceland',         station:'RÚV',                   tz:'Atlantic/Reykjavik' },
+  { code:'it', flag:'🇮🇹', name:'Italy',           station:'Rai 1 / DAZN',          tz:'Europe/Rome' },
+  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2',            tz:'Europe/Oslo' },
+  { code:'pt', flag:'🇵🇹', name:'Portugal',        station:'Sport TV / LiveModeTV', tz:'Europe/Lisbon' },
+  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',           tz:'Europe/Madrid' },
+  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',             tz:'Europe/Stockholm' },
+  { code:'uk', flag:'🇬🇧', name:'United Kingdom',  station:'BBC / ITV',             tz:'Europe/London' },
+  { code:'us', flag:'🇺🇸', name:'United States',   station:'FOX / FS1',             tz:'America/New_York' },
 ];
+
+// Map from browser locale / Intl timezone → country code
+const TZ_TO_COUNTRY = {
+  'Atlantic/Reykjavik':'is',
+  'Europe/London':'uk', 'Europe/Belfast':'uk', 'Europe/Guernsey':'uk', 'Europe/Isle_of_Man':'uk', 'Europe/Jersey':'uk',
+  'Europe/Stockholm':'se',
+  'Europe/Oslo':'no',
+  'Europe/Copenhagen':'dk',
+  'Europe/Helsinki':'fi', 'Europe/Mariehamn':'fi',
+  'Europe/Berlin':'de', 'Europe/Busingen':'de',
+  'Europe/Paris':'fr',
+  'Europe/Madrid':'es', 'Africa/Ceuta':'es', 'Atlantic/Canary':'es',
+  'Europe/Rome':'it', 'Europe/Vatican':'it', 'Europe/San_Marino':'it',
+  'Europe/Lisbon':'pt', 'Atlantic/Azores':'pt', 'Atlantic/Madeira':'pt',
+  'America/Toronto':'ca', 'America/Vancouver':'ca', 'America/Winnipeg':'ca',
+  'America/Edmonton':'ca', 'America/Halifax':'ca', 'America/St_Johns':'ca',
+  'America/Regina':'ca', 'America/Whitehorse':'ca', 'America/Yellowknife':'ca',
+  'America/New_York':'us', 'America/Chicago':'us', 'America/Denver':'us',
+  'America/Los_Angeles':'us', 'America/Phoenix':'us', 'America/Anchorage':'us',
+  'Pacific/Honolulu':'us',
+};
+function detectCountry() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return TZ_TO_COUNTRY[tz] || null;
+  } catch(e) { return null; }
+}
 
 // Per-match channel lookup. Keys = match.id.
 // IS: RÚV 2 matches listed; all others default to RÚV (+ dynamic /api/events override).
@@ -380,7 +407,11 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const [, tick] = React.useState(0);
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
   const [country, setCountry] = React.useState(() => {
-    try { return localStorage.getItem('wc_country') || 'is'; } catch(e) { return 'is'; }
+    try {
+      const saved = localStorage.getItem('wc_country');
+      if (saved && COUNTRIES.find(c => c.code === saved)) return saved;
+    } catch(e) {}
+    return detectCountry() || 'is';
   });
   const handleCountry = c => {
     setCountry(c);
