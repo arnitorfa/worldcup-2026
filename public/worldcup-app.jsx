@@ -462,6 +462,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const [search, setSearch] = React.useState('');
   const [, tick] = React.useState(0);
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
+  const [bracketMap, setBracketMap] = React.useState({}); // slot → real team name, e.g. "1st A" → "Mexico"
   const [country, setCountry] = React.useState(() => {
     try {
       const saved = localStorage.getItem('wc_country');
@@ -477,6 +478,22 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
   React.useEffect(() => {
     const t = setInterval(() => tick(n => n+1), 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Fetch bracket map — resolves "1st A" → "Mexico", "W73" → "Czech Republic" etc.
+  React.useEffect(() => {
+    fetch('/api/bracket')
+      .then(r => r.json())
+      .then(data => { if (Object.keys(data).length) setBracketMap(data); })
+      .catch(() => {});
+    // Refresh every 10 minutes during active tournament
+    const t = setInterval(() => {
+      fetch('/api/bracket')
+        .then(r => r.json())
+        .then(data => { if (Object.keys(data).length) setBracketMap(data); })
+        .catch(() => {});
+    }, 600000);
     return () => clearInterval(t);
   }, []);
 
@@ -531,11 +548,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const todayMs  = MATCHES.filter(m => isoDay(m.iso,tz) === today).sort((a,b) => a.iso.localeCompare(b.iso));
   const liveMs   = MATCHES.filter(m => matchStatus(m.iso, m.round) === 'live');
   const searchQ  = search.trim().toLowerCase();
-  const searchRes = searchQ ? MATCHES.filter(m =>
-    m.home.toLowerCase().includes(searchQ) || m.away.toLowerCase().includes(searchQ) ||
-    m.venue.toLowerCase().includes(searchQ) ||
-    (m.group && ('group '+m.group.toLowerCase()).includes(searchQ))
-  ).sort((a,b) => a.iso.localeCompare(b.iso)) : null;
+  const searchRes = searchQ ? MATCHES.filter(m => {
+    const h = (bracketMap[m.home] || m.home).toLowerCase();
+    const a = (bracketMap[m.away] || m.away).toLowerCase();
+    return h.includes(searchQ) || a.includes(searchQ) ||
+      m.venue.toLowerCase().includes(searchQ) ||
+      (m.group && ('group '+m.group.toLowerCase()).includes(searchQ));
+  }).sort((a,b) => a.iso.localeCompare(b.iso)) : null;
 
   // ── Styles ────────────────────────────────────────────────────────────────────
   const S = {
@@ -712,12 +731,19 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
   }
 
+  // Resolve bracket placeholder → real team name if known
+  function resolveTeam(name) {
+    return bracketMap[name] || name;
+  }
+
   // ── Match card — screenshot layout ───────────────────────────────────────────
   function MatchCard({ match }) {
     const status  = matchStatus(match.iso, match.round);
     const start   = fmt24(match.iso, tz);
     const end     = fmt24(endTime(match.iso, match.round).toISOString(), tz);
     const isGroup = match.round === 'group';
+    const home    = resolveTeam(match.home);
+    const away    = resolveTeam(match.away);
 
     return (
       <div style={S.evRow}>
@@ -764,7 +790,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
               ...S.evTitle,
               color: status === 'done' ? pal.muted : pal.fg
             }}>
-              {match.home} – {match.away}
+              {home} – {away}
             </div>
             {/* Subtitle — venue */}
             <div style={S.evSub}>
