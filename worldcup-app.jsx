@@ -125,29 +125,206 @@ const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SE
 
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
-  { code:'is', flag:'🇮🇸', name:'Iceland',        station:'RÚV',            tz:'Atlantic/Reykjavik' },
-  { code:'uk', flag:'🇬🇧', name:'United Kingdom', station:'BBC / ITV',      tz:'Europe/London' },
-  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',      tz:'Europe/Stockholm' },
-  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2',     tz:'Europe/Oslo' },
-  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports',tz:'Europe/Paris' },
-  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',    tz:'Europe/Madrid' },
-  { code:'us', flag:'🇺🇸', name:'United States',  station:'FOX / FS1',       tz:'America/New_York' },
+  { code:'ar', flag:'🇦🇷', name:'Argentina',       station:'Telefe / TyC Sports',   tz:'America/Argentina/Buenos_Aires' },
+  { code:'be', flag:'🇧🇪', name:'Belgium',         station:'Sporza / RTBF',         tz:'Europe/Brussels' },
+  { code:'br', flag:'🇧🇷', name:'Brazil',          station:'Globo / CazéTV',        tz:'America/Sao_Paulo' },
+  { code:'ca', flag:'🇨🇦', name:'Canada',          station:'CTV / TSN',             tz:'America/Toronto' },
+  { code:'hr', flag:'🇭🇷', name:'Croatia',         station:'HRT',                   tz:'Europe/Zagreb' },
+  { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',             tz:'Europe/Copenhagen' },
+  { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',             tz:'Europe/Helsinki' },
+  { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports',      tz:'Europe/Paris' },
+  { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',             tz:'Europe/Berlin' },
+  { code:'hu', flag:'🇭🇺', name:'Hungary',         station:'M4 Sport',              tz:'Europe/Budapest' },
+  { code:'is', flag:'🇮🇸', name:'Iceland',         station:'RÚV',                   tz:'Atlantic/Reykjavik' },
+  { code:'it', flag:'🇮🇹', name:'Italy',           station:'Rai 1 / DAZN',          tz:'Europe/Rome' },
+  { code:'mx', flag:'🇲🇽', name:'Mexico',          station:'Azteca 7 / TUDN',       tz:'America/Mexico_City' },
+  { code:'no', flag:'🇳🇴', name:'Norway',          station:'NRK / TV 2',            tz:'Europe/Oslo' },
+  { code:'pt', flag:'🇵🇹', name:'Portugal',        station:'Sport TV / LiveModeTV', tz:'Europe/Lisbon' },
+  { code:'es', flag:'🇪🇸', name:'Spain',           station:'La 1 / DAZN',           tz:'Europe/Madrid' },
+  { code:'se', flag:'🇸🇪', name:'Sweden',          station:'SVT / TV4',             tz:'Europe/Stockholm' },
+  { code:'ch', flag:'🇨🇭', name:'Switzerland',     station:'SRF / RTS / RSI',       tz:'Europe/Zurich' },
+  { code:'tr', flag:'🇹🇷', name:'Turkey',          station:'TRT Spor',              tz:'Europe/Istanbul' },
+  { code:'uk', flag:'🇬🇧', name:'United Kingdom',  station:'BBC / ITV',             tz:'Europe/London' },
+  { code:'us', flag:'🇺🇸', name:'United States',   station:'FOX / FS1',             tz:'America/New_York' },
 ];
 
+// Map from browser locale / Intl timezone → country code
+const TZ_TO_COUNTRY = {
+  'Atlantic/Reykjavik':'is',
+  'Europe/London':'uk', 'Europe/Belfast':'uk', 'Europe/Guernsey':'uk', 'Europe/Isle_of_Man':'uk', 'Europe/Jersey':'uk',
+  'Europe/Stockholm':'se',
+  'Europe/Oslo':'no',
+  'Europe/Copenhagen':'dk',
+  'Europe/Helsinki':'fi', 'Europe/Mariehamn':'fi',
+  'Europe/Berlin':'de', 'Europe/Busingen':'de',
+  'Europe/Paris':'fr',
+  'Europe/Madrid':'es', 'Africa/Ceuta':'es', 'Atlantic/Canary':'es',
+  'Europe/Rome':'it', 'Europe/Vatican':'it', 'Europe/San_Marino':'it',
+  'Europe/Lisbon':'pt', 'Atlantic/Azores':'pt', 'Atlantic/Madeira':'pt',
+  'Europe/Brussels':'be',
+  'Europe/Zagreb':'hr',
+  'Europe/Budapest':'hu',
+  'Europe/Zurich':'ch',
+  'Europe/Istanbul':'tr',
+  'America/Mexico_City':'mx','America/Monterrey':'mx','America/Merida':'mx',
+  'America/Mazatlan':'mx','America/Chihuahua':'mx','America/Hermosillo':'mx',
+  'America/Argentina/Buenos_Aires':'ar','America/Argentina/Cordoba':'ar',
+  'America/Argentina/Mendoza':'ar','America/Argentina/Salta':'ar',
+  'America/Sao_Paulo':'br','America/Manaus':'br','America/Belem':'br',
+  'America/Fortaleza':'br','America/Recife':'br','America/Maceio':'br',
+  'America/Bahia':'br','America/Cuiaba':'br','America/Porto_Velho':'br',
+  'America/Toronto':'ca', 'America/Vancouver':'ca', 'America/Winnipeg':'ca',
+  'America/Edmonton':'ca', 'America/Halifax':'ca', 'America/St_Johns':'ca',
+  'America/Regina':'ca', 'America/Whitehorse':'ca', 'America/Yellowknife':'ca',
+  'America/New_York':'us', 'America/Chicago':'us', 'America/Denver':'us',
+  'America/Los_Angeles':'us', 'America/Phoenix':'us', 'America/Anchorage':'us',
+  'Pacific/Honolulu':'us',
+};
+function detectCountry() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return TZ_TO_COUNTRY[tz] || null;
+  } catch(e) { return null; }
+}
+
 // Per-match channel lookup. Keys = match.id.
-// IS determined dynamically from /api/events (channelMap state), CH.is = static fallback.
+// IS: RÚV 2 matches listed; all others default to RÚV (+ dynamic /api/events override).
+// ES: La 1 for confirmed RTVE free matches; all others default to DAZN.
 // US: all matches on FOX/FS1 (handled in getChannel).
-// Sources: live-footballontv.com (UK), SVT/TV4 ICS (SE), NRK/TV2 ICS (NO), footao.tv (FR), rtve.es (ES), ruv.is (IS).
+// Sources: live-footballontv.com (UK), SVT/TV4 ICS (SE), NRK/TV2 ICS (NO),
+//          ruv.is schedule (IS), thelocal.es (ES).
 const CH = {
   is: {
+    // Matches on RÚV 2 — all unlisted matches default to RÚV
     1:'RÚV 2', 3:'RÚV 2', 5:'RÚV 2', 6:'RÚV 2', 9:'RÚV 2', 10:'RÚV 2',
     14:'RÚV 2',15:'RÚV 2',17:'RÚV 2',18:'RÚV 2',21:'RÚV 2',22:'RÚV 2',
     26:'RÚV 2',27:'RÚV 2',29:'RÚV 2',30:'RÚV 2',33:'RÚV 2',34:'RÚV 2',
     38:'RÚV 2',39:'RÚV 2',41:'RÚV 2',42:'RÚV 2',45:'RÚV 2',46:'RÚV 2',
     50:'RÚV 2',52:'RÚV 2',54:'RÚV 2',56:'RÚV 2',57:'RÚV 2',60:'RÚV 2',
     62:'RÚV 2',64:'RÚV 2',66:'RÚV 2',68:'RÚV 2',70:'RÚV 2',72:'RÚV 2',
+    // Knockouts on RÚV 2
     73:'RÚV 2',74:'RÚV 2',76:'RÚV 2',77:'RÚV 2',78:'RÚV 2',
     82:'RÚV 2',84:'RÚV 2',88:'RÚV 2',90:'RÚV 2',93:'RÚV 2',
+  },
+  mx: {
+    // Azteca 7 (free TV, 32 matches) — source: tvazteca.com official schedule
+    // Group stage — confirmed Azteca 7
+    1:'Azteca 7', 4:'Azteca 7', 6:'Azteca 7', 10:'Azteca 7', 19:'Azteca 7',
+    22:'Azteca 7',28:'Azteca 7',31:'Azteca 7',33:'Azteca 7',37:'Azteca 7',
+    43:'Azteca 7',48:'Azteca 7',53:'Azteca 7',55:'Azteca 7',63:'Azteca 7',
+    67:'Azteca 7',69:'Azteca 7',
+    // SF + Final confirmed on Azteca 7
+    101:'Azteca 7',102:'Azteca 7',104:'Azteca 7',
+    // All other matches → TUDN / ViX
+  },
+  ar: {
+    // Telefe (free TV, 30 matches) — Argentina games + opener + big matches
+    // Argentina group matches: 19 (vs Algeria), 41 (vs Austria), 71 (Jordan vs Argentina)
+    // Source: lanacion.com.ar / minutouno.com
+    1:'Telefe',
+    19:'Telefe', 41:'Telefe', 71:'Telefe',
+    // SF + Final → TV Pública + Telefe
+    101:'TV Pública',102:'TV Pública',103:'TV Pública',104:'TV Pública',
+    // All other matches → TyC Sports (default)
+  },
+  br: {
+    // Globo (free TV, 52 matches) — Brazil games + final confirmed
+    // Brazil group matches: 6 (vs Morocco), 31 (vs Haiti), 51 (Scotland vs Brazil)
+    // Source: mancheteesportiva.com.br / lance.com.br
+    6:'Globo', 31:'Globo', 51:'Globo', 104:'Globo',
+    // All other matches → CazéTV (YouTube, free, all 104) as default
+  },
+  ca: {
+    // CTV (free over-air) matches — source: tsn.ca official broadcast schedule
+    // Group stage
+    1:'CTV',  3:'CTV',  4:'CTV',  5:'CTV',  6:'CTV',  7:'CTV',
+    8:'CTV',  9:'CTV',  10:'CTV', 21:'CTV', 22:'CTV', 23:'CTV',
+    27:'CTV', 33:'CTV', 34:'CTV', 35:'CTV', 37:'CTV', 38:'CTV',
+    39:'CTV', 40:'CTV', 47:'CTV', 49:'CTV', 62:'CTV', 65:'CTV',
+    67:'CTV', 69:'CTV', 71:'CTV',
+    // R32
+    73:'CTV', 80:'CTV', 81:'CTV', 82:'CTV', 83:'CTV', 85:'CTV',
+    // R16
+    89:'CTV', 90:'CTV', 91:'CTV', 96:'CTV',
+    // QF + SF + Final
+    97:'CTV', 98:'CTV', 99:'CTV', 100:'CTV',
+    101:'CTV',102:'CTV',104:'CTV',
+    // All other matches → TSN (subscription)
+  },
+  pt: {
+    // Portugal games — free-to-air (RTP / SIC / TVI, exact channel TBD)
+    21:'RTP/SIC/TVI', 45:'RTP/SIC/TVI', 69:'RTP/SIC/TVI',
+    // LiveModeTV (free YouTube) matches — source: magazine-hd.com
+    1:'LiveModeTV', 3:'LiveModeTV', 6:'LiveModeTV', 9:'LiveModeTV',
+    13:'LiveModeTV',17:'LiveModeTV',26:'LiveModeTV',31:'LiveModeTV',
+    34:'LiveModeTV',37:'LiveModeTV',41:'LiveModeTV',51:'LiveModeTV',
+    55:'LiveModeTV',61:'LiveModeTV',
+    101:'LiveModeTV',102:'LiveModeTV',104:'LiveModeTV',
+    // All other matches → Sport TV (subscription)
+  },
+  it: {
+    // Rai 1 matches — source: affaritaliani.it (35 partite in chiaro, all on Rai 1)
+    // Group stage
+    1:'Rai 1', 3:'Rai 1', 6:'Rai 1', 10:'Rai 1', 14:'Rai 1', 17:'Rai 1',
+    22:'Rai 1',26:'Rai 1',29:'Rai 1',34:'Rai 1',37:'Rai 1',38:'Rai 1',
+    41:'Rai 1',46:'Rai 1',49:'Rai 1',55:'Rai 1',61:'Rai 1',67:'Rai 1',68:'Rai 1',
+    // R32
+    73:'Rai 1',74:'Rai 1',77:'Rai 1',82:'Rai 1',84:'Rai 1',88:'Rai 1',
+    // R16
+    90:'Rai 1',91:'Rai 1',93:'Rai 1',96:'Rai 1',
+    // QF
+    97:'Rai 1',98:'Rai 1',99:'Rai 1',100:'Rai 1',
+    // SF + Finals
+    101:'Rai 1',102:'Rai 1',103:'Rai 1',104:'Rai 1',
+    // All other matches → DAZN (default)
+  },
+  fi: {
+    // Yle (TV2/Areena) matches — source: yle.fi/a/74-20218518 (complete official schedule)
+    // Group stage
+    3:'Yle',  4:'Yle',  9:'Yle',  10:'Yle', 11:'Yle', 12:'Yle',
+    17:'Yle', 18:'Yle', 19:'Yle', 20:'Yle', 25:'Yle', 26:'Yle',
+    27:'Yle', 28:'Yle', 33:'Yle', 34:'Yle', 35:'Yle', 36:'Yle',
+    41:'Yle', 42:'Yle', 43:'Yle', 44:'Yle', 49:'Yle', 50:'Yle',
+    51:'Yle', 52:'Yle', 53:'Yle', 54:'Yle', 61:'Yle', 62:'Yle',
+    63:'Yle', 64:'Yle', 65:'Yle', 66:'Yle', 71:'Yle', 72:'Yle',
+    // Knockouts
+    73:'Yle', 75:'Yle', 77:'Yle', 78:'Yle', 79:'Yle', 83:'Yle',
+    84:'Yle', 85:'Yle', 91:'Yle', 92:'Yle', 95:'Yle', 96:'Yle',
+    97:'Yle', 99:'Yle', 101:'Yle', 104:'Yle',
+    // All other matches → MTV (default in getChannel)
+  },
+  dk: {
+    // TV 2 group matches (source: sportportalen.dk / TV2.dk / DR.dk)
+    1:'TV 2', 2:'TV 2', 4:'TV 2', 6:'TV 2', 10:'TV 2', 13:'TV 2',
+    14:'TV 2',18:'TV 2',19:'TV 2',20:'TV 2',21:'TV 2',22:'TV 2',
+    24:'TV 2',28:'TV 2',32:'TV 2',36:'TV 2',37:'TV 2',38:'TV 2',
+    53:'TV 2',54:'TV 2',
+    // DR group matches
+    3:'DR',  5:'DR',  7:'DR',  8:'DR',  9:'DR',  11:'DR',
+    12:'DR', 15:'DR', 16:'DR', 17:'DR', 23:'DR', 25:'DR',
+    26:'DR', 27:'DR', 29:'DR', 30:'DR', 31:'DR', 33:'DR',
+    34:'DR', 35:'DR',
+    // Matchday 3 & knockouts: channel TBD → fallback to "DR / TV 2"
+  },
+  de: {
+    // ARD group matches
+    3:'ARD',  7:'ARD',  9:'ARD',  13:'ARD', 14:'ARD', 19:'ARD',
+    29:'ARD', 31:'ARD', 39:'ARD', 41:'ARD', 42:'ARD', 45:'ARD',
+    46:'ARD', 48:'ARD', 55:'ARD', 57:'ARD', 61:'ARD', 64:'ARD',
+    // ZDF group matches (incl. opening)
+    1:'ZDF',  5:'ZDF',  6:'ZDF',  15:'ZDF', 16:'ZDF', 20:'ZDF',
+    21:'ZDF', 22:'ZDF', 25:'ZDF', 27:'ZDF', 33:'ZDF', 34:'ZDF',
+    35:'ZDF', 38:'ZDF', 44:'ZDF', 68:'ZDF',
+    // ZDF: Round of 32 + QF + Final
+    73:'ZDF', 74:'ZDF', 75:'ZDF', 76:'ZDF', 77:'ZDF', 78:'ZDF',
+    79:'ZDF', 80:'ZDF', 81:'ZDF', 82:'ZDF', 83:'ZDF', 84:'ZDF',
+    85:'ZDF', 86:'ZDF', 87:'ZDF', 88:'ZDF',
+    97:'ZDF', 98:'ZDF', 99:'ZDF', 100:'ZDF',
+    104:'ZDF',
+    // ARD: R16 + SF
+    89:'ARD', 90:'ARD', 91:'ARD', 92:'ARD', 93:'ARD', 94:'ARD', 95:'ARD', 96:'ARD',
+    101:'ARD',102:'ARD',
+    // Match 103 (3rd place) → MagentaTV (default)
   },
   fr: {
     // Group stage — M6
@@ -160,12 +337,16 @@ const CH = {
     89:'M6', 90:'M6', 91:'M6', 93:'M6', 95:'M6', 96:'M6',
     97:'M6', 98:'M6', 99:'M6',
     101:'M6',102:'M6',103:'M6',104:'M6',
+    // All other matches → beIN Sports (default in getChannel)
   },
   es: {
+    // RTVE La 1 — confirmed free-to-air (thelocal.es, May 2026)
     1:'La 1', 3:'La 1', 6:'La 1', 9:'La 1', 13:'La 1', 17:'La 1',
     22:'La 1',26:'La 1',29:'La 1',33:'La 1',37:'La 1',41:'La 1',
     46:'La 1',51:'La 1',55:'La 1',63:'La 1',69:'La 1',
+    // Semis, 3rd place, final
     101:'La 1',102:'La 1',103:'La 1',104:'La 1',
+    // All other matches → DAZN (default in getChannel)
   },
   uk: {
     1:'ITV',  2:'ITV',  3:'BBC',  4:'BBC',  5:'ITV',  6:'BBC',
@@ -230,6 +411,20 @@ const CH = {
 function getChannel(matchId, country, channelMap) {
   if (country === 'is') return channelMap[matchId] || CH.is?.[matchId] || 'RÚV';
   if (country === 'us') return 'FOX / FS1';
+  if (country === 'ar') return CH.ar?.[matchId] || 'TyC Sports';
+  if (country === 'be') return 'Sporza';
+  if (country === 'hr') return 'HRT';
+  if (country === 'hu') return 'M4 Sport';
+  if (country === 'mx') return CH.mx?.[matchId] || 'TUDN / ViX';
+  if (country === 'ch') return 'SRF / RTS / RSI';
+  if (country === 'tr') return 'TRT Spor';
+  if (country === 'br') return CH.br?.[matchId] || 'CazéTV';
+  if (country === 'ca') return CH.ca?.[matchId] || 'TSN';
+  if (country === 'pt') return CH.pt?.[matchId] || 'Sport TV';
+  if (country === 'it') return CH.it?.[matchId] || 'DAZN';
+  if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
+  if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
+  if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
   if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
   if (country === 'uk' && (matchId >= 73)) return 'BBC / ITV';
@@ -267,8 +462,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const [search, setSearch] = React.useState('');
   const [, tick] = React.useState(0);
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
+  const [bracketMap, setBracketMap] = React.useState({}); // slot → real team name, e.g. "1st A" → "Mexico"
   const [country, setCountry] = React.useState(() => {
-    try { return localStorage.getItem('wc_country') || 'is'; } catch(e) { return 'is'; }
+    try {
+      const saved = localStorage.getItem('wc_country');
+      if (saved && COUNTRIES.find(c => c.code === saved)) return saved;
+    } catch(e) {}
+    return detectCountry() || 'is';
   });
   const handleCountry = c => {
     setCountry(c);
@@ -278,6 +478,22 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
   React.useEffect(() => {
     const t = setInterval(() => tick(n => n+1), 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Fetch bracket map — resolves "1st A" → "Mexico", "W73" → "Czech Republic" etc.
+  React.useEffect(() => {
+    fetch('/api/bracket')
+      .then(r => r.json())
+      .then(data => { if (Object.keys(data).length) setBracketMap(data); })
+      .catch(() => {});
+    // Refresh every 10 minutes during active tournament
+    const t = setInterval(() => {
+      fetch('/api/bracket')
+        .then(r => r.json())
+        .then(data => { if (Object.keys(data).length) setBracketMap(data); })
+        .catch(() => {});
+    }, 600000);
     return () => clearInterval(t);
   }, []);
 
@@ -332,21 +548,26 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const todayMs  = MATCHES.filter(m => isoDay(m.iso,tz) === today).sort((a,b) => a.iso.localeCompare(b.iso));
   const liveMs   = MATCHES.filter(m => matchStatus(m.iso, m.round) === 'live');
   const searchQ  = search.trim().toLowerCase();
-  const searchRes = searchQ ? MATCHES.filter(m =>
-    m.home.toLowerCase().includes(searchQ) || m.away.toLowerCase().includes(searchQ) ||
-    m.venue.toLowerCase().includes(searchQ) ||
-    (m.group && ('group '+m.group.toLowerCase()).includes(searchQ))
-  ).sort((a,b) => a.iso.localeCompare(b.iso)) : null;
+  const searchRes = searchQ ? MATCHES.filter(m => {
+    const h = (bracketMap[m.home] || m.home).toLowerCase();
+    const a = (bracketMap[m.away] || m.away).toLowerCase();
+    return h.includes(searchQ) || a.includes(searchQ) ||
+      m.venue.toLowerCase().includes(searchQ) ||
+      (m.group && ('group '+m.group.toLowerCase()).includes(searchQ));
+  }).sort((a,b) => a.iso.localeCompare(b.iso)) : null;
 
   // ── Styles ────────────────────────────────────────────────────────────────────
   const S = {
     root:{ minHeight:'100vh', background:pal.bg, color:pal.fg,
       fontFamily:'"Inter",system-ui,sans-serif', letterSpacing:'-0.005em',
       display:'flex', flexDirection:'column' },
-    topBar:{ display:'flex', alignItems:'center', gap:mobile?10:20,
-      padding:mobile?'12px 16px':'18px 32px',
+    topBar:{ display:'flex', flexDirection: mobile?'column':'row', alignItems: mobile?'stretch':'center',
+      gap: mobile?8:20,
+      padding:mobile?'10px 16px':'18px 32px',
       borderBottom:`1px solid ${pal.hair}`,
       position:'sticky', top:0, zIndex:50, background:pal.bg },
+    topRow:{ display:'flex', alignItems:'center', gap:10 },
+    bottomRow:{ display:'flex', alignItems:'center', gap:8 },
     iconBtn:{ width:38, height:38, borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`,
       color:pal.fg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
@@ -379,7 +600,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     // Group bar
     groupBar:{ display:'flex', alignItems:'center',
       padding:mobile?'8px 12px':'10px 24px',
-      borderBottom:`1px solid ${pal.hair}`, gap:4, overflowX:'auto', scrollbarWidth:'none' },
+      borderBottom:`1px solid ${pal.hair}`, gap:4,
+      flexWrap: mobile?'wrap':'nowrap',
+      overflowX: mobile?'visible':'auto', scrollbarWidth:'none' },
     groupLabel:{ fontSize:9.5, fontWeight:800, letterSpacing:'0.14em',
       color:pal.muted, textTransform:'uppercase', flexShrink:0, marginRight:4 },
     groupChip:(a) => ({ minWidth:mobile?36:40, height:mobile?36:40, borderRadius:10,
@@ -402,18 +625,20 @@ function WCApp({ mobile, dark, onThemeChange }) {
       position:'sticky', top:0, maxHeight:'calc(100vh - 57px)', overflowY:'auto' },
     timeline:{ flex:1, padding:mobile?'0 0 48px':'0 0 48px', overflowY:'auto', minWidth:0 },
 
-    // Date header — same style as main app
-    dateHdr:{ fontSize:11, fontWeight:700, letterSpacing:'0.10em',
-      color:pal.muted, textTransform:'capitalize',
-      padding:mobile?'20px 16px 0':'22px 32px 0' },
+    // Date header
+    dateHdr:{ fontSize:mobile?15:17, fontWeight:800, letterSpacing:'-0.01em',
+      color:pal.fg, textTransform:'capitalize',
+      padding:mobile?'24px 16px 10px':'28px 32px 12px',
+      borderBottom:`1px solid ${pal.hair}`,
+      marginBottom:0 },
 
     // ── EVENT CARD — matches main app row style (screenshot) ──────────────────
     // Each card: hairline separator like main timeline
     evRow:{ borderBottom:`1px solid ${pal.hair}`, padding:mobile?'14px 16px':'16px 32px' },
 
-    // 4-column grid: [time] [icon-box] [content] [station]
+    // grid: mobile = [time] [content] [station], desktop = [time] [icon] [content] [station]
     evGrid:{ display:'grid',
-      gridTemplateColumns:mobile?'68px 48px 1fr auto':'80px 52px 1fr auto',
+      gridTemplateColumns:mobile?'68px 1fr auto':'80px 52px 1fr auto',
       gap:mobile?'0 10px':'0 14px',
       alignItems:'center' },
 
@@ -462,9 +687,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     countrySel:{ height:36, padding:'0 10px', borderRadius:10, cursor:'pointer',
       background:pal.card, border:`1px solid ${pal.hair}`, color:pal.fg,
       fontSize:13, fontFamily:'inherit', fontWeight:600, flexShrink:0,
-      outline:'none', appearance:'none', WebkitAppearance:'none',
-      paddingRight:28, backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23${isDark?'9CA3AF':'6B7280'}' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")`,
-      backgroundRepeat:'no-repeat', backgroundPosition:'right 10px center' },
+      outline:'none' },
 
     // Live pane
     liveHd:{ display:'flex', alignItems:'center', gap:8, marginBottom:16 },
@@ -508,12 +731,19 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
   }
 
+  // Resolve bracket placeholder → real team name if known
+  function resolveTeam(name) {
+    return bracketMap[name] || name;
+  }
+
   // ── Match card — screenshot layout ───────────────────────────────────────────
   function MatchCard({ match }) {
     const status  = matchStatus(match.iso, match.round);
     const start   = fmt24(match.iso, tz);
     const end     = fmt24(endTime(match.iso, match.round).toISOString(), tz);
     const isGroup = match.round === 'group';
+    const home    = resolveTeam(match.home);
+    const away    = resolveTeam(match.away);
 
     return (
       <div style={S.evRow}>
@@ -527,10 +757,12 @@ function WCApp({ mobile, dark, onThemeChange }) {
             <span style={S.evTimeEnd}>to {end}</span>
           </div>
 
-          {/* ICON */}
-          <div style={S.evIcon}>
-            <SportIcon id="fb" size={mobile?24:28} strokeWidth={1.4} />
-          </div>
+          {/* ICON — desktop only */}
+          {!mobile && (
+            <div style={S.evIcon}>
+              <SportIcon id="fb" size={28} strokeWidth={1.4} />
+            </div>
+          )}
 
           {/* CONTENT */}
           <div style={S.evContent}>
@@ -558,7 +790,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
               ...S.evTitle,
               color: status === 'done' ? pal.muted : pal.fg
             }}>
-              {match.home} – {match.away}
+              {home} – {away}
             </div>
             {/* Subtitle — venue */}
             <div style={S.evSub}>
@@ -583,12 +815,17 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
     const byDate = {};
     matches.forEach(m => { const d=isoDay(m.iso,tz); if(!byDate[d])byDate[d]=[]; byDate[d].push(m); });
-    return Object.entries(byDate).sort().map(([d,arr]) => (
-      <div key={d}>
-        <div style={S.dateHdr}>{fmtDay(arr[0].iso,tz)}</div>
-        {arr.map(m => <MatchCard key={m.id} match={m}/>)}
-      </div>
-    ));
+    return Object.entries(byDate).sort().map(([d,arr]) => {
+      arr.sort((a,b) => a.iso.localeCompare(b.iso));
+      // Use the earliest match in the group to label the date header (correct local date)
+      const firstByLocalTime = arr.reduce((a,b) => new Date(a.iso) < new Date(b.iso) ? a : b);
+      return (
+        <div key={d}>
+          <div style={S.dateHdr}>{fmtDay(firstByLocalTime.iso,tz)}</div>
+          {arr.map(m => <MatchCard key={m.id} match={m}/>)}
+        </div>
+      );
+    });
   }
 
   // ── Views ─────────────────────────────────────────────────────────────────────
@@ -676,44 +913,75 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
       {/* TOP BAR */}
       <div style={S.topBar}>
-        <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
-          <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
-            style={{height:26,width:'auto',display:'block'}}/>
-          {!mobile && <a href="/" style={S.backBtn}>← Main site</a>}
-        </div>
-        {!mobile && (
+        {mobile ? (<>
+          {/* Mobile row 1: logo + country */}
+          <div style={S.topRow}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:24,width:'auto',display:'block'}}/>
+            <div style={{flex:1}}/>
+            <select
+              style={S.countrySel}
+              value={country}
+              onChange={e => handleCountry(e.target.value)}
+              title="Select country"
+            >
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+              ))}
+            </select>
+          </div>
+          {/* Mobile row 2: search + theme toggle */}
+          <div style={S.bottomRow}>
+            <div style={{...S.searchWrap, maxWidth:'none', marginLeft:0, flex:1}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+              </svg>
+              <input style={S.searchInput} placeholder="Search teams, venues…"
+                value={search} onChange={e => setSearch(e.target.value)}/>
+              {search && <button onClick={() => setSearch('')}
+                style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+            </div>
+            <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+              {isDark
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+            </button>
+          </div>
+        </>) : (<>
+          {/* Desktop: single row */}
+          <div style={{display:'flex',alignItems:'center',gap:12,flexShrink:0}}>
+            <img src={`assets/logos/sportzone-${isDark?'dark':'light'}.svg`} alt="SportZone"
+              style={{height:26,width:'auto',display:'block'}}/>
+          </div>
           <div>
             <div style={{fontWeight:800,fontSize:18,letterSpacing:'-0.02em',lineHeight:1}}>FIFA World Cup 2026</div>
             <div style={{fontSize:10,color:pal.muted,letterSpacing:'0.10em',marginTop:4}}>11 JUN – 19 JUL · USA / CANADA / MEXICO</div>
           </div>
-        )}
-        {/* Country selector */}
-        <select
-          style={S.countrySel}
-          value={country}
-          onChange={e => handleCountry(e.target.value)}
-          title="Select country"
-        >
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
-
-        <div style={{...S.searchWrap}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
-          </svg>
-          <input style={S.searchInput} placeholder="Search teams, venues…"
-            value={search} onChange={e => setSearch(e.target.value)}/>
-          {search && <button onClick={() => setSearch('')}
-            style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
-        </div>
-        <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
-          {isDark
-            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-            : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
-        </button>
-        {mobile && <a href="/" style={{...S.iconBtn,textDecoration:'none',fontSize:14}}>←</a>}
+          <div style={{...S.searchWrap}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={pal.muted} strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <input style={S.searchInput} placeholder="Search teams, venues…"
+              value={search} onChange={e => setSearch(e.target.value)}/>
+            {search && <button onClick={() => setSearch('')}
+              style={{background:'none',border:'none',cursor:'pointer',color:pal.muted,fontSize:16,lineHeight:1,padding:'0 2px',display:'flex',alignItems:'center'}}>×</button>}
+          </div>
+          <button style={S.iconBtn} onClick={() => onThemeChange(!isDark)}>
+            {isDark
+              ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+          </button>
+          <select
+            style={S.countrySel}
+            value={country}
+            onChange={e => handleCountry(e.target.value)}
+            title="Select country"
+          >
+            {COUNTRIES.map(c => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        </>)}
       </div>
 
       {/* LIVE BANNER */}
@@ -758,7 +1026,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
       {tab==='group' && !searchRes && (
         <div style={S.groupBar} data-sh>
           <button style={S.allarChip(group==='ALL')} onClick={() => setGroup('ALL')}>ALL GROUPS</button>
-          <span style={S.groupLabel}>GROUPS:</span>
+          {!mobile && <span style={S.groupLabel}>GROUPS:</span>}
           {GROUPS.map(g => (
             <button key={g} style={S.groupChip(group===g && group!=='ALL')} onClick={() => setGroup(g)}>{g}</button>
           ))}
@@ -794,6 +1062,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
                 ))}
               </>;
             })()}
+
           </div>
         )}
 
@@ -806,16 +1075,18 @@ function WCApp({ mobile, dark, onThemeChange }) {
           <div style={{textAlign:'center',marginTop:32,color:pal.muted,fontSize:11,padding:mobile?'0 16px 16px':'0 32px 16px'}}>
             {(() => {
               const c = COUNTRIES.find(x=>x.code===country);
-              if (country==='is') return 'RÚV holds broadcast rights to all 104 matches of the 2026 World Cup';
+              if (country==='is') return 'RÚV and RÚV 2 hold broadcast rights to all 104 matches of the 2026 World Cup';
               if (country==='uk') return 'BBC and ITV share rights to all 104 matches in the United Kingdom';
               if (country==='se') return 'SVT and TV4 share rights to all 104 matches in Sweden';
               if (country==='no') return 'NRK and TV 2 share rights to all 104 matches in Norway';
+              if (country==='es') return 'RTVE (La 1) shows ~20 matches free-to-air including all Spain games. DAZN broadcasts all 104 matches.';
               if (country==='us') return 'FOX/FS1 (English) and Telemundo (Spanish) broadcast all 104 matches in the United States';
               return '';
             })()}
           </div>
         </div>
       </div>
+
     </div>
   );
 }
