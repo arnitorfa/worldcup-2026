@@ -99,11 +99,21 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
 
-  // Cache 15 min during group stage, 5 min during knockouts
   const now = new Date();
-  const koStart = new Date('2026-06-28T19:00:00Z');
-  const maxAge = now >= koStart ? 300 : 900;
-  res.setHeader('Cache-Control', `s-maxage=${maxAge}, stale-while-revalidate=60`);
+
+  // Group stage ends June 28 at ~05:00 UTC (last simultaneous matches finish).
+  // Only start resolving standings AFTER all group matches are complete.
+  const GROUP_STAGE_END = new Date('2026-06-28T05:00:00Z');
+
+  if (now < GROUP_STAGE_END) {
+    // Too early — group stage not finished yet, return empty so app shows placeholders
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=300');
+    res.status(200).json({});
+    return;
+  }
+
+  // After group stage: cache 5 min during knockouts (results change frequently)
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
 
   const f = globalThis.fetch;
   try {
