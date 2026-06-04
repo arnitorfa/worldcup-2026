@@ -436,6 +436,7 @@ const TZ_IS = 'Atlantic/Reykjavik'; // always used for API fetch / Iceland
 // These accept a tz parameter so they can adapt to any country's timezone
 const fmt24 = (iso, tz) => new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:tz||TZ_IS});
 const fmtDay = (iso, tz) => new Date(iso).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',timeZone:tz||TZ_IS});
+const fmtShort = (iso, tz) => new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:tz||TZ_IS});
 const isoDay = (iso, tz) => new Date(iso).toLocaleDateString('sv-SE',{timeZone:tz||TZ_IS});
 const todayStr = (tz) => new Date().toLocaleDateString('sv-SE',{timeZone:tz||TZ_IS});
 
@@ -779,10 +780,14 @@ function WCApp({ mobile, dark, onThemeChange }) {
                 <span style={S.evMetaDot}>·</span>
                 <span style={S.ridillBadge}>GROUP {match.group}</span>
               </>}
-              {!isGroup && match.round && (
+              {!isGroup && match.round && (<>
+                <span style={S.evMetaDot}>·</span>
                 <span style={{ ...S.ridillBadge, color:pal.muted, background:'rgba(128,128,128,0.12)' }}>
                   {KO_LABELS[match.round]}
                 </span>
+                <span style={S.evMetaDot}>·</span>
+                <span style={S.evMetaText}>{fmtShort(match.iso, tz)}</span>
+              </>
               )}
               {status === 'live' && (
                 <div style={S.liveBadge}>
