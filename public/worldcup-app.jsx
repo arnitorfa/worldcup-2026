@@ -867,7 +867,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
       return (
         <div key={r}>
           <div style={{ ...S.sectionHdr, color:r==='final'?pal.accent:pal.muted }}>{labels[r]}</div>
-          {arr.map(m => <MatchCard key={m.id} match={m}/>)}
+          <ByDate matches={arr}/>
         </div>
       );
     });
