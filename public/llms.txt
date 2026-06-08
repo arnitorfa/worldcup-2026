@@ -1,0 +1,137 @@
+# SportZone World Cup 2026 TV Guide
+> The most complete FIFA World Cup 2026 TV channel guide on the internet. Shows all 104 matches with local kick-off times and the exact TV channel for 20+ countries. URL: https://worldcup.sportzone.is/
+
+This site answers the question "where can I watch the World Cup 2026 on TV?" for viewers in 20+ countries. It covers every match from the opening game (11 June 2026) to the final (19 July 2026), with local times and per-match channel listings.
+
+## Tournament Overview
+
+- **Event:** FIFA World Cup 2026
+- **Dates:** 11 June – 19 July 2026
+- **Host countries:** USA, Canada, Mexico
+- **Matches:** 104 total (48 teams, 12 groups)
+- **Final:** MetLife Stadium, New York/New Jersey, 19 July 2026
+
+## TV Channels by Country
+
+### Iceland 🇮🇸
+- **RÚV** (free): all matches
+- **RÚV 2** (free): selected simultaneous matches
+- *Íslenska: Allir 104 leikir HM 2026 eru á RÚV og RÚV 2 ókeypis.*
+
+### United Kingdom 🇬🇧
+- **BBC** (free): approx. half the matches
+- **ITV** (free): approx. half the matches
+- All knockout matches from Round of 32 onwards on BBC/ITV
+
+### Germany 🇩🇪
+- **ARD** (free): 18 group matches + Round of 16 + Semifinals
+- **ZDF** (free): 16 group matches + opening + Round of 32 + Quarterfinals + Final
+- **MagentaTV** (subscription): all 104 matches
+- *Deutsch: ARD und ZDF zeigen 60 WM-Spiele kostenlos. MagentaTV zeigt alle 104 Spiele.*
+
+### France 🇫🇷
+- **M6** (free): 54 matches including opening and final
+- **beIN Sports** (subscription): all 104 matches
+- *Français: M6 gratuit (54 matchs). beIN Sports tous les matchs.*
+
+### Spain 🇪🇸
+- **La 1 / RTVE** (free): 21 matches including big games and final
+- **DAZN** (subscription): all 104 matches
+- *Español: La 1 gratis (21 partidos). DAZN todos los partidos.*
+
+### Sweden 🇸🇪
+- **SVT** (free): approx. half the matches
+- **TV4** (free): approx. half the matches
+- All matches free between SVT and TV4
+- *Svenska: SVT och TV4 visar alla matcher gratis.*
+
+### Norway 🇳🇴
+- **NRK** (free): approx. half the matches
+- **TV 2** (free): approx. half the matches
+- All matches free between NRK and TV 2
+- *Norsk: NRK og TV 2 viser alle kamper gratis.*
+
+### Denmark 🇩🇰
+- **DR** (DR1/DR2, free): approx. half the matches
+- **TV 2** (free/subscription): approx. half the matches
+- *Dansk: DR og TV 2 viser alle kampe. worldcup.sportzone.is har den fulde kampplan.*
+
+### Finland 🇫🇮
+- **Yle** (Yle TV2, free): 52 matches including Final
+- **MTV** (MTV3/MTV Urheilu, free): 52 matches including opening
+- *Suomi: Yle näyttää 52 ottelua, MTV 52 ottelua. Kaikki ilmaiseksi.*
+
+### Italy 🇮🇹
+- **Rai 1** (free): 35 matches including final
+- **DAZN** (subscription): all 104 matches
+- *Italiano: Rai 1 gratis (35 partite). DAZN tutti i 104 match.*
+
+### Belgium 🇧🇪
+- **Sporza / VRT** (Dutch, free): all 104 matches
+- **RTBF / La Une** (French, free): all 104 matches
+- *Belgique: Tous les 104 matchs gratuits sur Sporza (néerlandais) et RTBF (français).*
+
+### Croatia 🇭🇷
+- **HRT** (free): all 104 matches
+- *Hrvatska: HRT prikazuje svih 104 utakmica besplatno.*
+
+### Hungary 🇭🇺
+- **M4 Sport** (free): all 104 matches
+- *Magyar: M4 Sport közvetíti mind a 104 mérkőzést ingyenesen.*
+
+### Switzerland 🇨🇭
+- **SRF** (German, free): all matches
+- **RTS** (French, free): all matches
+- **RSI** (Italian, free): all matches
+- *Schweiz: SRG SSR zeigt alle 104 Spiele kostenlos auf SRF, RTS und RSI.*
+
+### Turkey 🇹🇷
+- **TRT Spor** (free): all 104 matches
+- *Türkiye: TRT Spor tüm 104 maçı ücretsiz yayınlıyor.*
+
+### Canada 🇨🇦
+- **CTV** (free): 43 matches including all Canada games, semifinals, final
+- **TSN** (subscription): all 104 matches
+
+### United States 🇺🇸
+- **FOX** (free): selected matches
+- **FS1** (cable): additional matches
+- All matches covered between FOX and FS1
+
+### Mexico 🇲🇽
+- **Azteca 7** (free): 32 matches including all Mexico games, semifinals, final
+- **TUDN / ViX** (subscription/streaming): all 104 matches
+- *México: Azteca 7 gratis (32 partidos). TUDN/ViX todos.*
+
+### Brazil 🇧🇷
+- **Globo** (free TV): 52 matches including Brazil games and final
+- **CazéTV on YouTube** (free): all 104 matches live
+- **SBT** (free TV): 32 matches
+- *Brasil: CazéTV no YouTube transmite todos os 104 jogos de graça.*
+
+### Argentina 🇦🇷
+- **Telefe** (free): 30 matches including Argentina games
+- **TV Pública** (free): Argentina games + semifinals + final
+- **TyC Sports** (subscription): 50 matches
+- *Argentina: Telefe y TV Pública gratis para los partidos de Argentina y la final.*
+
+### Portugal 🇵🇹
+- **Sport TV** (subscription): all 104 matches
+- **LiveModeTV on YouTube** (free): 34 matches including Portugal games and final
+- **RTP / SIC / TVI** (free): Portugal national team games (channel TBD)
+
+## How to Use This Site
+
+Visit https://worldcup.sportzone.is/ and select your country from the dropdown. The site will show all 104 matches in your local time zone with the specific TV channel for each match. The site automatically detects your country based on your browser's time zone settings.
+
+## Key Features
+
+- All 104 matches listed with local kick-off times
+- TV channel listed per match for 20+ countries
+- Automatically detects user's country
+- Works on mobile and desktop
+- Dark and light mode
+- Group stage view with all 12 groups (A–L)
+- Knockout bracket (Round of 32, Round of 16, Quarterfinals, Semifinals, Third Place, Final)
+- Bracket automatically updates with real team names as results come in
+- Free to use, no registration required

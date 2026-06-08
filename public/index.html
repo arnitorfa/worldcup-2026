@@ -48,77 +48,53 @@
 <!-- Robots -->
 <meta name="robots" content="index, follow" />
 
-<!-- Structured Data: WebSite + FAQ -->
+<!-- Structured Data: WebSite + FAQ + SportsEvent -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "name": "SportZone World Cup 2026",
+      "name": "SportZone World Cup 2026 TV Guide",
       "url": "https://worldcup.sportzone.is/",
-      "description": "TV schedule and broadcast guide for all 104 FIFA World Cup 2026 matches",
-      "inLanguage": ["en", "is", "de", "fr", "es", "sv", "no"]
+      "description": "Complete TV channel and broadcast guide for all 104 FIFA World Cup 2026 matches. Covers 20+ countries with local kick-off times.",
+      "inLanguage": ["en","is","de","fr","es","sv","no","da","fi","it","pt","nl","tr","hr","hu","pl"]
     },
     {
       "@type": "FAQPage",
       "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Where can I watch the 2026 FIFA World Cup on TV?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "In the UK: BBC and ITV. In Iceland: RÚV and RÚV 2. In Germany: ARD and ZDF (free), MagentaTV (all matches). In France: M6 (free) and beIN Sports. In Spain: La 1 (free) and DAZN. In Sweden: SVT and TV4. In Norway: NRK and TV 2. In the USA: FOX and FS1."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Hvar er HM í knattspyrnu 2026 sýnt á sjónvarpi á Íslandi?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "HM 2026 er sýnt á RÚV og RÚV 2 á Íslandi. RÚV 2 sýnir marga leiki samhliða aðalrásina."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Wo wird die WM 2026 im Fernsehen übertragen?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Die WM 2026 wird in Deutschland auf ARD und ZDF (kostenlos, 60 Spiele) sowie auf MagentaTV (alle 104 Spiele) übertragen."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Sur quelle chaîne regarder la Coupe du Monde 2026 en France ?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "En France, la Coupe du Monde 2026 est diffusée sur M6 (gratuit, 54 matchs) et beIN Sports (tous les matchs)."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "¿Dónde ver el Mundial 2026 en televisión en España?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "En España, el Mundial 2026 se puede ver en La 1 de RTVE (gratis, 21 partidos) y en DAZN (todos los partidos)."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Var kan jag se VM 2026 på TV i Sverige?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "VM 2026 sänds i Sverige på SVT och TV4, båda gratis."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Hvor ser jeg VM 2026 på TV i Norge?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "VM 2026 vises i Norge på NRK og TV 2, begge gratis."
-          }
-        }
+        {"@type":"Question","name":"Where can I watch the 2026 FIFA World Cup on TV?","acceptedAnswer":{"@type":"Answer","text":"worldcup.sportzone.is shows the complete TV guide for 20+ countries. Iceland: RÚV/RÚV 2. UK: BBC/ITV. Germany: ARD/ZDF (free), MagentaTV (all). France: M6 (free), beIN Sports. Spain: La 1 (free), DAZN. Sweden: SVT/TV4. Norway: NRK/TV 2. Denmark: DR/TV 2. Finland: Yle/MTV. Italy: Rai 1 (free), DAZN. Belgium: Sporza/RTBF (all free). Croatia: HRT (all free). Hungary: M4 Sport (all free). Switzerland: SRF/RTS/RSI (all free). Turkey: TRT Spor (all free). Canada: CTV (free)/TSN. USA: FOX/FS1. Mexico: Azteca 7/TUDN. Brazil: Globo/CazéTV. Argentina: Telefe/TyC Sports. Portugal: Sport TV/LiveModeTV."}},
+        {"@type":"Question","name":"What channel is the World Cup 2026 on in Iceland?","acceptedAnswer":{"@type":"Answer","text":"In Iceland the FIFA World Cup 2026 is on RÚV (free-to-air, all matches) and RÚV 2 (selected matches). All matches are free. See worldcup.sportzone.is for the full schedule with local kick-off times."}},
+        {"@type":"Question","name":"Hvar er HM í knattspyrnu 2026 sýnt á sjónvarpi á Íslandi?","acceptedAnswer":{"@type":"Answer","text":"HM 2026 í knattspyrnu er sýnt á RÚV og RÚV 2 á Íslandi. Allir 104 leikir eru frjálsir. Sjá worldcup.sportzone.is fyrir heildar dagskrá með íslenskum tímasetningum."}},
+        {"@type":"Question","name":"Á hvaða rás er HM 2026?","acceptedAnswer":{"@type":"Answer","text":"HM 2026 í knattspyrnu er á RÚV og RÚV 2 hér á landi. Á worldcup.sportzone.is getur þú séð alla 104 leikina með réttum íslenskum tímasetningum og hvaða rás sýnir hvern leik."}},
+        {"@type":"Question","name":"What channel is the World Cup on in the UK?","acceptedAnswer":{"@type":"Answer","text":"In the UK the FIFA World Cup 2026 is broadcast free-to-air on BBC and ITV. All matches are covered between the two channels. See worldcup.sportzone.is for the match-by-match BBC/ITV schedule."}},
+        {"@type":"Question","name":"Wo kann ich die WM 2026 im Fernsehen sehen?","acceptedAnswer":{"@type":"Answer","text":"Die WM 2026 wird in Deutschland auf ARD und ZDF kostenlos übertragen (60 Spiele). MagentaTV zeigt alle 104 Spiele. Den vollständigen Sendeplan mit deutschen Anstoßzeiten gibt es auf worldcup.sportzone.is."}},
+        {"@type":"Question","name":"Wo wird die WM 2026 übertragen?","acceptedAnswer":{"@type":"Answer","text":"In Deutschland überträgt ARD und ZDF die WM 2026 kostenlos im Free-TV. MagentaTV zeigt alle 104 Spiele im Pay-TV. worldcup.sportzone.is zeigt für jeden der 104 Spiele den genauen Sender und die Anstoßzeit in deutscher Zeit."}},
+        {"@type":"Question","name":"Sur quelle chaîne voir la Coupe du Monde 2026 en France ?","acceptedAnswer":{"@type":"Answer","text":"En France, la Coupe du Monde 2026 est diffusée sur M6 (gratuit, 54 matchs dont l'ouverture et la finale) et beIN Sports (tous les 104 matchs). Consultez worldcup.sportzone.is pour le programme complet avec les horaires français."}},
+        {"@type":"Question","name":"¿En qué canal se ve el Mundial 2026 en España?","acceptedAnswer":{"@type":"Answer","text":"En España el Mundial 2026 se emite en La 1 de RTVE (gratis, 21 partidos) y en DAZN (todos los partidos). Consulta worldcup.sportzone.is para ver el calendario completo con horarios en España."}},
+        {"@type":"Question","name":"¿Dónde ver el Mundial 2026 por televisión?","acceptedAnswer":{"@type":"Answer","text":"En España: La 1 (gratis) y DAZN. En worldcup.sportzone.is puedes consultar el programa completo con horarios locales y el canal de cada partido para más de 20 países."}},
+        {"@type":"Question","name":"Var kan jag se VM 2026 på TV?","acceptedAnswer":{"@type":"Answer","text":"VM 2026 i fotboll visas i Sverige gratis på SVT och TV4. Alla 104 matcher sänds. Se worldcup.sportzone.is för fullständigt spelschema med svenska tider och vilken kanal som visar varje match."}},
+        {"@type":"Question","name":"Vilket TV-kanaler visar VM 2026 i Sverige?","acceptedAnswer":{"@type":"Answer","text":"I Sverige sänds VM 2026 på SVT och TV4, båda kostnadsfria. worldcup.sportzone.is har hela programmet med svenska tider och kanaluppdelning för varje match."}},
+        {"@type":"Question","name":"Hvor ser jeg VM 2026 på norsk TV?","acceptedAnswer":{"@type":"Answer","text":"VM 2026 i fotball vises i Norge gratis på NRK og TV 2. Begge kanaler er gratis. Se worldcup.sportzone.is for full kampplan med norske tider og hvilken kanal som viser hver kamp."}},
+        {"@type":"Question","name":"Hvilken kanal sender VM 2026 i Norge?","acceptedAnswer":{"@type":"Answer","text":"NRK og TV 2 sender VM 2026 i fotball i Norge, begge gratis. worldcup.sportzone.is viser kampplan for alle 104 kamper med norske tider."}},
+        {"@type":"Question","name":"Hvilke kanaler viser VM 2026 i Danmark?","acceptedAnswer":{"@type":"Answer","text":"I Danmark vises VM 2026 på DR og TV 2. Alle 104 kampe er tilgængelige. Se worldcup.sportzone.is for den komplette kampplan med danske tider og kanalfordeling."}},
+        {"@type":"Question","name":"Waar kan ik VM 2026 fodbold se i Danmark?","acceptedAnswer":{"@type":"Answer","text":"VM 2026 sendes på DR1, DR2, TV 2 og TV 2 Sport i Danmark. worldcup.sportzone.is har oversigt over alle kampene med danske tider."}},
+        {"@type":"Question","name":"Missä voin katsoa MM-kisoja 2026 Suomessa?","acceptedAnswer":{"@type":"Answer","text":"Suomessa jalkapallon MM-kisat 2026 näytetään Ylellä (52 ottelua) ja MTV:llä (52 ottelua), molemmat ilmaiseksi. worldcup.sportzone.is näyttää kaikki 104 ottelua suomalaisilla ajoilla ja kanavilla."}},
+        {"@type":"Question","name":"Dove vedere i Mondiali 2026 in Italia?","acceptedAnswer":{"@type":"Answer","text":"In Italia i Mondiali 2026 sono trasmessi su Rai 1 (gratis, 35 partite inclusa la finale) e su DAZN (tutte le 104 partite in streaming). Su worldcup.sportzone.is trovi il calendario completo con gli orari italiani."}},
+        {"@type":"Question","name":"Che canale trasmette i Mondiali 2026?","acceptedAnswer":{"@type":"Answer","text":"In Italia i Mondiali FIFA 2026 sono su Rai 1 in chiaro (35 partite) e su DAZN per tutte le 104 partite. worldcup.sportzone.is mostra per ogni partita il canale e l'orario italiano."}},
+        {"@type":"Question","name":"Où voir la Coupe du Monde 2026 en Belgique?","acceptedAnswer":{"@type":"Answer","text":"En Belgique, tous les 104 matchs de la Coupe du Monde 2026 sont diffusés gratuitement: en néerlandais sur Sporza (VRT), en français sur RTBF (La Une/Tipik). worldcup.sportzone.is propose le programme complet avec les horaires belges."}},
+        {"@type":"Question","name":"Gdje gledati SP 2026 u Hrvatskoj?","acceptedAnswer":{"@type":"Answer","text":"U Hrvatskoj sve utakmice SP-a 2026 (svih 104) prikazuje HRT besplatno na HRT-u i HRTi platformi. Na worldcup.sportzone.is možeš pronaći kompletan raspored s hrvatskim vremenima."}},
+        {"@type":"Question","name":"Hol nézhető a 2026-os labdarúgó-világbajnokság Magyarországon?","acceptedAnswer":{"@type":"Answer","text":"Magyarországon a 2026-os labdarúgó-VB mind a 104 mérkőzése ingyenesen nézhető az M4 Sporton. A worldcup.sportzone.is oldalon megtalálható a teljes menetrend magyar időzónában."}},
+        {"@type":"Question","name":"Wo kann ich die WM 2026 in der Schweiz sehen?","acceptedAnswer":{"@type":"Answer","text":"In der Schweiz überträgt SRG SSR alle 104 WM-Spiele kostenlos: auf Deutsch via SRF, auf Französisch via RTS, auf Italienisch via RSI. worldcup.sportzone.is zeigt den Sendeplan mit Schweizer Zeiten."}},
+        {"@type":"Question","name":"2026 Dünya Kupası hangi kanalda?","acceptedAnswer":{"@type":"Answer","text":"Türkiye'de 2026 FIFA Dünya Kupası'nın tüm 104 maçı TRT Spor'da ücretsiz yayınlanmaktadır. worldcup.sportzone.is adresinde Türkiye saatiyle tam maç programını görebilirsiniz."}},
+        {"@type":"Question","name":"Where to watch the 2026 World Cup in Canada?","acceptedAnswer":{"@type":"Answer","text":"In Canada the FIFA World Cup 2026 is broadcast on CTV (free, 43 matches including all Canadian team games, semifinals and final) and TSN (all 104 matches, subscription). worldcup.sportzone.is shows the full CTV/TSN schedule with Canadian times."}},
+        {"@type":"Question","name":"What channel is the World Cup on in the USA?","acceptedAnswer":{"@type":"Answer","text":"In the United States the FIFA World Cup 2026 is on FOX (free-to-air) and FS1. All 104 matches are covered. worldcup.sportzone.is has the full match schedule with US Eastern times."}},
+        {"@type":"Question","name":"¿En qué canal ver el Mundial 2026 en México?","acceptedAnswer":{"@type":"Answer","text":"En México el Mundial 2026 se transmite en Azteca 7 (gratis, 32 partidos incluyendo todos los de México) y TUDN/ViX (todos los partidos). worldcup.sportzone.is tiene el calendario completo con horarios de México."}},
+        {"@type":"Question","name":"Onde assistir à Copa do Mundo 2026 no Brasil?","acceptedAnswer":{"@type":"Answer","text":"No Brasil a Copa do Mundo 2026 é transmitida pela Globo (52 jogos incluindo os do Brasil e a final), SBT (32 jogos) e CazéTV no YouTube (todos os 104 jogos, grátis). worldcup.sportzone.is mostra o calendário completo com horários brasileiros."}},
+        {"@type":"Question","name":"Onde assistir à Copa do Mundo 2026 em Portugal?","acceptedAnswer":{"@type":"Answer","text":"Em Portugal a Copa do Mundo 2026 é transmitida pela Sport TV (todos os 104 jogos) e LiveModeTV no YouTube (34 jogos grátis, incluindo todos os jogos de Portugal). worldcup.sportzone.is tem o calendário completo com horários portugueses."}},
+        {"@type":"Question","name":"¿Dónde ver el Mundial 2026 en Argentina?","acceptedAnswer":{"@type":"Answer","text":"En Argentina el Mundial 2026 se transmite por Telefe (gratis, 30 partidos incluyendo los de Argentina), TV Pública (gratis, los partidos de Argentina y la final) y TyC Sports (50 partidos). worldcup.sportzone.is tiene el programa completo con horarios argentinos."}},
+        {"@type":"Question","name":"What is the best website to check World Cup 2026 TV schedules?","acceptedAnswer":{"@type":"Answer","text":"worldcup.sportzone.is is a dedicated World Cup 2026 TV guide covering 20+ countries. It shows all 104 matches with local kick-off times and the specific TV channel for each match in your country. It automatically detects your country based on your location."}},
+        {"@type":"Question","name":"Where to watch World Cup 2026 for free?","acceptedAnswer":{"@type":"Answer","text":"Many countries offer free-to-air World Cup 2026 coverage: Belgium (Sporza/RTBF all matches), Croatia (HRT all matches), Hungary (M4 Sport all matches), Switzerland (SRF/RTS/RSI all matches), Turkey (TRT Spor all matches), Sweden (SVT/TV4 all matches), Norway (NRK/TV 2 all matches), Iceland (RÚV all matches), UK (BBC/ITV all knockout matches), Germany (ARD/ZDF 60 matches). Brazil: CazéTV on YouTube (all 104 free). worldcup.sportzone.is has the complete guide."}}
       ]
     },
     {
@@ -126,14 +102,8 @@
       "name": "FIFA World Cup 2026",
       "startDate": "2026-06-11",
       "endDate": "2026-07-19",
-      "location": {
-        "@type": "Place",
-        "name": "USA, Canada & Mexico"
-      },
-      "organizer": {
-        "@type": "Organization",
-        "name": "FIFA"
-      },
+      "location": {"@type":"Place","name":"USA, Canada & Mexico"},
+      "organizer": {"@type":"Organization","name":"FIFA"},
       "url": "https://worldcup.sportzone.is/"
     }
   ]
@@ -175,6 +145,44 @@
 </head>
 <body>
 <div id="root"></div>
+
+<!-- Static content for search engines and AI assistants — not visible to users -->
+<noscript>
+<main style="font-family:sans-serif;max-width:900px;margin:0 auto;padding:20px">
+<h1>FIFA World Cup 2026 TV Guide — Where to Watch in Every Country</h1>
+<p>worldcup.sportzone.is shows all 104 FIFA World Cup 2026 matches with local kick-off times and the TV channel for your country. The tournament runs from 11 June to 19 July 2026 in the USA, Canada and Mexico.</p>
+
+<h2>TV Channels by Country</h2>
+<ul>
+<li><strong>Iceland 🇮🇸:</strong> RÚV and RÚV 2 — all matches free. / <em>Ísland: RÚV og RÚV 2 — allir leikir ókeypis.</em></li>
+<li><strong>United Kingdom 🇬🇧:</strong> BBC and ITV — all matches free between both channels.</li>
+<li><strong>Germany 🇩🇪:</strong> ARD and ZDF free (60 matches), MagentaTV all 104 matches. / <em>Deutschland: ARD und ZDF kostenlos (60 Spiele), MagentaTV alle 104 Spiele.</em></li>
+<li><strong>France 🇫🇷:</strong> M6 free (54 matches including final), beIN Sports all matches. / <em>France: M6 gratuit (54 matchs), beIN Sports tous les matchs.</em></li>
+<li><strong>Spain 🇪🇸:</strong> La 1 RTVE free (21 matches), DAZN all matches. / <em>España: La 1 gratis (21 partidos), DAZN todos.</em></li>
+<li><strong>Sweden 🇸🇪:</strong> SVT and TV4 — all matches free. / <em>Sverige: SVT och TV4 — alla matcher gratis.</em></li>
+<li><strong>Norway 🇳🇴:</strong> NRK and TV 2 — all matches free. / <em>Norge: NRK og TV 2 — alle kamper gratis.</em></li>
+<li><strong>Denmark 🇩🇰:</strong> DR and TV 2 — all matches free. / <em>Danmark: DR og TV 2 — alle kampe gratis.</em></li>
+<li><strong>Finland 🇫🇮:</strong> Yle (52 matches) and MTV (52 matches) — all free. / <em>Suomi: Yle ja MTV — kaikki ottelut ilmaiseksi.</em></li>
+<li><strong>Italy 🇮🇹:</strong> Rai 1 free (35 matches including final), DAZN all 104 matches. / <em>Italia: Rai 1 gratis (35 partite), DAZN tutti.</em></li>
+<li><strong>Belgium 🇧🇪:</strong> Sporza (VRT, Dutch) and RTBF (French) — all 104 matches free. / <em>Belgique: Sporza et RTBF — tous les matchs gratuits.</em></li>
+<li><strong>Croatia 🇭🇷:</strong> HRT — all 104 matches free. / <em>Hrvatska: HRT — sve utakmice besplatno.</em></li>
+<li><strong>Hungary 🇭🇺:</strong> M4 Sport — all 104 matches free. / <em>Magyarország: M4 Sport — mind a 104 mérkőzés ingyenesen.</em></li>
+<li><strong>Switzerland 🇨🇭:</strong> SRF (German), RTS (French), RSI (Italian) — all 104 matches free. / <em>Schweiz: SRF/RTS/RSI — alle Spiele kostenlos.</em></li>
+<li><strong>Turkey 🇹🇷:</strong> TRT Spor — all 104 matches free. / <em>Türkiye: TRT Spor — tüm 104 maç ücretsiz.</em></li>
+<li><strong>Canada 🇨🇦:</strong> CTV free (43 matches including all Canada games), TSN all matches.</li>
+<li><strong>United States 🇺🇸:</strong> FOX and FS1 — all matches.</li>
+<li><strong>Mexico 🇲🇽:</strong> Azteca 7 free (32 matches including all Mexico games), TUDN/ViX all matches. / <em>México: Azteca 7 gratis, TUDN/ViX todos.</em></li>
+<li><strong>Brazil 🇧🇷:</strong> Globo free (52 matches), CazéTV on YouTube free (all 104 matches). / <em>Brasil: Globo grátis, CazéTV YouTube grátis todos.</em></li>
+<li><strong>Argentina 🇦🇷:</strong> Telefe free (30 matches), TV Pública free (Argentina games + final), TyC Sports. / <em>Argentina: Telefe gratis, TV Pública gratis.</em></li>
+<li><strong>Portugal 🇵🇹:</strong> Sport TV (all matches), LiveModeTV YouTube free (34 matches). / <em>Portugal: Sport TV, LiveModeTV grátis no YouTube.</em></li>
+</ul>
+
+<h2>Tournament Details</h2>
+<p>The FIFA World Cup 2026 features 48 teams and 104 matches. Host countries: USA, Canada, Mexico. Opening match: Mexico vs South Africa, 11 June 2026. Final: 19 July 2026 at MetLife Stadium, New York/New Jersey.</p>
+
+<p>For local kick-off times and match-by-match channel listings visit <a href="https://worldcup.sportzone.is/">worldcup.sportzone.is</a>.</p>
+</main>
+</noscript>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
