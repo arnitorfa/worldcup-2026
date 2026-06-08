@@ -624,7 +624,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     livePane:{ width:280, flexShrink:0, borderRight:`1px solid ${pal.hair}`,
       padding:'24px 20px', background:pal.panelBg,
       position:'sticky', top:0, maxHeight:'calc(100vh - 57px)', overflowY:'auto' },
-    timeline:{ flex:1, padding:mobile?'0 0 108px':'0 0 108px', overflowY:'auto', minWidth:0 },
+    timeline:{ flex:1, padding:mobile?'0 0 48px':'0 0 48px', overflowY:'auto', minWidth:0 },
 
     // Date header
     dateHdr:{ fontSize:mobile?15:17, fontWeight:800, letterSpacing:'-0.01em',
@@ -915,7 +915,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const todayCount = todayMs.length;
 
   return (
-    <>
     <div style={S.root}>
       <style>{`
         @keyframes ifPulse{0%{box-shadow:0 0 0 0 rgba(255,59,71,.55)}70%{box-shadow:0 0 0 8px rgba(255,59,71,0)}100%{box-shadow:0 0 0 0 rgba(255,59,71,0)}}
@@ -1100,20 +1099,5 @@ function WCApp({ mobile, dark, onThemeChange }) {
       </div>
 
     </div>
-
-    {/* ── Promo sticky banner ───────────────────────────────────────────────── */}
-    <a href="https://wintheworldcup.com" target="_blank" rel="noopener noreferrer"
-      style={{
-        position:'fixed', bottom:0, left:0, right:0, zIndex:100,
-        display:'block', lineHeight:0,
-        boxShadow:'0 -2px 12px rgba(0,0,0,0.35)',
-      }}>
-      <img
-        src="banner.png"
-        alt="Win the World Cup Game – Pick 11 and Win It All – wintheworldcup.com"
-        style={{ width:'100%', height:60, objectFit:'cover', objectPosition:'center', display:'block' }}
-      />
-    </a>
-    </>
   );
 }
