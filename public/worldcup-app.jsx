@@ -464,6 +464,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const [, tick] = React.useState(0);
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
   const [bracketMap, setBracketMap] = React.useState({}); // slot → real team name, e.g. "1st A" → "Mexico"
+  const [resultsMap, setResultsMap] = React.useState({}); // "2026-06-11T19:00" → { hs, as, status }
   const [country, setCountry] = React.useState(() => {
     try {
       const saved = localStorage.getItem('wc_country');
@@ -495,6 +496,20 @@ function WCApp({ mobile, dark, onThemeChange }) {
         .then(data => { if (Object.keys(data).length) setBracketMap(data); })
         .catch(() => {});
     }, 600000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Fetch match results from /api/results (proxies api-football.com server-side)
+  React.useEffect(() => {
+    function loadResults() {
+      fetch('/api/results')
+        .then(r => r.json())
+        .then(data => { if (Object.keys(data).length) setResultsMap(data); })
+        .catch(() => {});
+    }
+    loadResults();
+    // Poll every 2 minutes — Vercel CDN caches 60s when live, 5min otherwise
+    const t = setInterval(loadResults, 120000);
     return () => clearInterval(t);
   }, []);
 
@@ -746,6 +761,14 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const home    = resolveTeam(match.home);
     const away    = resolveTeam(match.away);
 
+    // Result from api-football (via /api/results proxy)
+    const result  = resultsMap[match.iso.slice(0, 16)]; // e.g. { hs:2, as:1, status:"FT" }
+    const LIVE_S  = new Set(['1H','HT','2H','ET','BT','P']);
+    const DONE_S  = new Set(['FT','AET','PEN']);
+    const hasScore = result && result.hs != null && result.as != null;
+    const isFT    = result && DONE_S.has(result.status);
+    const isLiveS = result && LIVE_S.has(result.status);
+
     return (
       <div style={S.evRow}>
         <div style={S.evGrid}>
@@ -789,19 +812,41 @@ function WCApp({ mobile, dark, onThemeChange }) {
                 <span style={S.evMetaText}>{fmtShort(match.iso, tz)}</span>
               </>
               )}
-              {status === 'live' && (
+              {(status === 'live' || isLiveS) && (
                 <div style={S.liveBadge}>
                   <span style={S.liveDotEl}/>
-                  LIVE
+                  {result?.status || 'LIVE'}
+                </div>
+              )}
+              {isFT && (
+                <div style={{
+                  padding:'2px 7px', borderRadius:3,
+                  background:'rgba(128,128,128,0.12)', color:pal.muted,
+                  fontSize:9.5, fontWeight:800, letterSpacing:'0.14em',
+                }}>
+                  {result.status}
                 </div>
               )}
             </div>
-            {/* Title */}
+            {/* Title — shows score inline when result is available */}
             <div style={{
               ...S.evTitle,
-              color: status === 'done' ? pal.muted : pal.fg
+              color: (status === 'done' || isFT) ? pal.muted : pal.fg
             }}>
-              {home} – {away}
+              {hasScore ? (
+                <>
+                  <span style={{opacity:isFT?0.65:1}}>{home}</span>
+                  <span style={{
+                    fontFamily:'"JetBrains Mono",monospace',
+                    fontWeight:900,
+                    color: isLiveS ? '#FF3B47' : pal.fg,
+                    padding:'0 4px',
+                  }}> {result.hs}–{result.as} </span>
+                  <span style={{opacity:isFT?0.65:1}}>{away}</span>
+                </>
+              ) : (
+                <>{home} – {away}</>
+              )}
             </div>
             {/* Subtitle — venue */}
             <div style={S.evSub}>
@@ -1099,5 +1144,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
       </div>
 
     </div>
+
   );
 }
