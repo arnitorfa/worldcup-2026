@@ -73,12 +73,10 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
     }
 
-    // Include _debug field so we can see what's happening — remove later
-    res.status(200).json({ ...results, _debug: { total, nonNS: Object.keys(results).length } });
+    res.status(200).json(results);
   } catch (err) {
     console.error('results error:', err.message);
-    // On error return debug info so we can diagnose
     res.setHeader('Cache-Control', 's-maxage=30');
-    res.status(200).json({ _error: err.message });
+    res.status(200).json({});
   }
 }
