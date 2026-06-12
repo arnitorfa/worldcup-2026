@@ -33,8 +33,13 @@ export default async function handler(req, res) {
       },
     });
 
-    if (!r.ok) throw new Error(`api-football error ${r.status}`);
+    if (!r.ok) throw new Error(`api-football http ${r.status}`);
     const data = await r.json();
+
+    // api-football returns errors array on auth failure
+    if (data.errors && Object.keys(data.errors).length) {
+      throw new Error(`api-football errors: ${JSON.stringify(data.errors)}`);
+    }
 
     // Live statuses — used to decide cache TTL
     const LIVE_STATUSES = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P']);
@@ -42,6 +47,7 @@ export default async function handler(req, res) {
 
     let hasLive = false;
     const results = {};
+    const total = (data.response || []).length;
 
     for (const fix of (data.response || [])) {
       const status = fix.fixture?.status?.short;
@@ -58,6 +64,8 @@ export default async function handler(req, res) {
       if (LIVE_STATUSES.has(status)) hasLive = true;
     }
 
+    console.log(`results: ${total} fixtures from api, ${Object.keys(results).length} non-NS`);
+
     // Cache aggressively when nothing is live, short when matches are in progress
     if (hasLive) {
       res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=20');
@@ -65,11 +73,12 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
     }
 
-    res.status(200).json(results);
+    // Include _debug field so we can see what's happening — remove later
+    res.status(200).json({ ...results, _debug: { total, nonNS: Object.keys(results).length } });
   } catch (err) {
     console.error('results error:', err.message);
-    // On error return empty — app gracefully shows no scores
+    // On error return debug info so we can diagnose
     res.setHeader('Cache-Control', 's-maxage=30');
-    res.status(200).json({});
+    res.status(200).json({ _error: err.message });
   }
 }
