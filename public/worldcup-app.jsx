@@ -460,6 +460,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
   const [tab, setTab]     = React.useState('group');
   const [group, setGroup] = React.useState('ALL');
+  const [showFinished, setShowFinished] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [, tick] = React.useState(0);
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
@@ -886,10 +887,19 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
   // ── Views ─────────────────────────────────────────────────────────────────────
   function GroupView() {
-    const groupMs = MATCHES.filter(m => m.round === 'group');
-    if (group === 'ALL') return <ByDate matches={groupMs}/>;
-    const ms = groupMs.filter(m => m.group === group).sort((a,b) => a.iso.localeCompare(b.iso));
-    const teams = [...new Set(ms.flatMap(m => [m.home,m.away]))];
+    const allGroupMs = MATCHES.filter(m => m.round === 'group');
+
+    // Filter by date: finished = strictly before today, default = today and future
+    const dateFiltered = showFinished
+      ? allGroupMs.filter(m => isoDay(m.iso, tz) < today)
+      : allGroupMs.filter(m => isoDay(m.iso, tz) >= today);
+
+    if (group === 'ALL') return <ByDate matches={dateFiltered}/>;
+
+    const ms = dateFiltered.filter(m => m.group === group).sort((a,b) => a.iso.localeCompare(b.iso));
+    // Show team names from the full group (not filtered) so chips always appear
+    const allGroupTeams = allGroupMs.filter(m => m.group === group);
+    const teams = [...new Set(allGroupTeams.flatMap(m => [m.home,m.away]))];
     return (
       <>
         <div style={S.groupTeams}>
@@ -1103,10 +1113,20 @@ function WCApp({ mobile, dark, onThemeChange }) {
       {/* GROUP BAR */}
       {tab==='group' && !searchRes && (
         <div style={S.groupBar} data-sh>
-          <button style={S.allarChip(group==='ALL')} onClick={() => setGroup('ALL')}>ALL GROUPS</button>
+          <button style={S.allarChip(group==='ALL' && !showFinished)}
+            onClick={() => { setGroup('ALL'); setShowFinished(false); }}>ALL GROUPS</button>
+          <button style={{
+            ...S.allarChip(showFinished),
+            borderColor: showFinished ? (isDark?'#7B7B82':'#76736C') : undefined,
+            background: showFinished ? (isDark?'rgba(123,123,130,0.18)':'rgba(118,115,108,0.15)') : 'transparent',
+            color: showFinished ? pal.muted : pal.muted,
+          }} onClick={() => { setShowFinished(f => !f); setGroup('ALL'); }}>
+            FINISHED
+          </button>
           {!mobile && <span style={S.groupLabel}>GROUPS:</span>}
           {GROUPS.map(g => (
-            <button key={g} style={S.groupChip(group===g && group!=='ALL')} onClick={() => setGroup(g)}>{g}</button>
+            <button key={g} style={S.groupChip(group===g && !showFinished)}
+              onClick={() => { setGroup(g); setShowFinished(false); }}>{g}</button>
           ))}
         </div>
       )}
