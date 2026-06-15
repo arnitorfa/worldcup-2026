@@ -39,7 +39,7 @@ const MATCHES = [
   mk(55,'2026-06-25T20:00:00Z','Ecuador','Germany','E','New York/NJ'),
   mk(56,'2026-06-25T20:00:00Z','Curaçao','Ivory Coast','E','Philadelphia'),
   mk(10,'2026-06-14T20:00:00Z','Netherlands','Japan','F','Dallas'),
-  mk(12,'2026-06-15T02:00:00Z','Tunisia','Sweden','F','Monterrey'),
+  mk(12,'2026-06-15T02:00:00Z','Sweden','Tunisia','F','Monterrey'),
   mk(33,'2026-06-20T17:00:00Z','Netherlands','Sweden','F','Houston'),
   mk(36,'2026-06-21T04:00:00Z','Tunisia','Japan','F','Monterrey'),
   mk(57,'2026-06-25T23:00:00Z','Tunisia','Netherlands','F','Kansas City'),
