@@ -123,6 +123,29 @@ const MATCHES = [
 const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 const KO_LABELS = {r32:'ROUND OF 32',r16:'ROUND OF 16',qf:'QUARTER-FINAL',sf:'SEMI-FINAL',tp:'THIRD PLACE',final:'FINAL'};
 
+// Team name → flag filename (public/assets/logos/flags/)
+const TEAM_FLAG = {
+  'Algeria':'algeria','Argentina':'argentina','Australia':'australia',
+  'Austria':'austria','Belgium':'belgium','Bosnia-Herzegovina':'bosnia',
+  'Brazil':'brazil','Canada':'canada','Cape Verde':'cape-verde',
+  'Colombia':'columbia','Croatia':'croatia','Curaçao':'curacao',
+  'Czech Republic':'czech-republic','DR Congo':'congo','Ecuador':'equador',
+  'Egypt':'egypt','England':'england','France':'france','Germany':'germany',
+  'Ghana':'ghana','Haiti':'haiti','Iran':'iran','Iraq':'iraq',
+  'Ivory Coast':'ivory-coast','Japan':'japan','Jordan':'jordan',
+  'Mexico':'mexico','Morocco':'morocco','Netherlands':'netherlands',
+  'New Zealand':'new-zealand','Norway':'norway','Panama':'panama',
+  'Paraguay':'paraguay','Portugal':'portugal','Qatar':'qatar',
+  'Saudi Arabia':'saudi-arabia','Scotland':'scotland','Senegal':'senegal',
+  'South Africa':'south-africa','South Korea':'south-korea','Spain':'spain',
+  'Sweden':'sweden','Switzerland':'switzerland','Tunisia':'tunis',
+  'Türkiye':'turkey','Uruguay':'urugay','USA':'usa','Uzbekistan':'uzbekistan',
+};
+function flagUrl(team) {
+  const f = TEAM_FLAG[team];
+  return f ? `assets/logos/flags/${f}.svg` : null;
+}
+
 // ── Countries & TV channels per match ─────────────────────────────────────────
 const COUNTRIES = [
   { code:'ar', flag:'🇦🇷', name:'Argentina',       station:'Telefe / TyC Sports',   tz:'America/Argentina/Buenos_Aires' },
@@ -885,6 +908,143 @@ function WCApp({ mobile, dark, onThemeChange }) {
     });
   }
 
+  // ── Group standings ───────────────────────────────────────────────────────────
+  function computeStandings(groupLetter) {
+    const gms = MATCHES.filter(m => m.group === groupLetter);
+    const teams = [...new Set(gms.flatMap(m => [m.home, m.away]))];
+    const st = {};
+    teams.forEach(t => { st[t] = {p:0,w:0,d:0,l:0,gf:0,ga:0}; });
+    gms.forEach(m => {
+      const r = resultsMap[m.iso.slice(0,16)];
+      if (!r || r.hs==null || r.as==null || !['FT','AET','PEN'].includes(r.status)) return;
+      const h=m.home, a=m.away;
+      st[h].p++; st[a].p++;
+      st[h].gf+=r.hs; st[h].ga+=r.as;
+      st[a].gf+=r.as; st[a].ga+=r.hs;
+      if (r.hs>r.as) {st[h].w++;st[a].l++;}
+      else if (r.hs<r.as) {st[a].w++;st[h].l++;}
+      else {st[h].d++;st[a].d++;}
+    });
+    return teams.map(t => ({
+      team:t, ...st[t],
+      gd: st[t].gf-st[t].ga,
+      pts: st[t].w*3+st[t].d,
+    })).sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf);
+  }
+
+  function GroupStandings({ groupLetter }) {
+    const rows = computeStandings(groupLetter);
+    const cSize = mobile ? 128 : 156;
+    const fSize = mobile ? 44 : 54;
+    const radius = mobile ? 40 : 50;
+    const cx = cSize / 2;
+    // N, E, S, W positions on the circle
+    const flagPos = [
+      {top: cx-radius-fSize/2, left: cx-fSize/2},
+      {top: cx-fSize/2,        left: cx+radius-fSize/2},
+      {top: cx+radius-fSize/2, left: cx-fSize/2},
+      {top: cx-fSize/2,        left: cx-radius-fSize/2},
+    ];
+
+    return (
+      <div style={{padding: mobile?'20px 16px 16px':'24px 32px 20px',
+        borderBottom:`1px solid ${pal.hair}`}}>
+        {/* Flag ring */}
+        <div style={{display:'flex', justifyContent:'center', marginBottom:20}}>
+          <div style={{position:'relative', width:cSize, height:cSize}}>
+            {/* Faint dashed ring */}
+            <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,
+              borderRadius:'50%', border:`1px dashed ${pal.hair2}`}}/>
+            {rows.map((row, i) => {
+              const pos = flagPos[i];
+              const url = flagUrl(row.team);
+              return (
+                <div key={row.team} title={row.team} style={{
+                  position:'absolute', top:pos.top, left:pos.left,
+                  width:fSize, height:fSize, borderRadius:'50%',
+                  overflow:'hidden', border:`2px solid ${pal.hair}`,
+                  background:pal.card,
+                  boxShadow:`0 2px 6px rgba(0,0,0,${isDark?0.3:0.12})`,
+                }}>
+                  {url
+                    ? <img src={url} alt={row.team}
+                        style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                    : <div style={{width:'100%',height:'100%',display:'flex',
+                        alignItems:'center',justifyContent:'center',
+                        fontSize:8,color:pal.muted,fontWeight:800,textAlign:'center'}}>
+                        {row.team.slice(0,3).toUpperCase()}
+                      </div>
+                  }
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Standings table */}
+        <table style={{width:'100%',borderCollapse:'collapse'}}>
+          <thead>
+            <tr style={{borderBottom:`1px solid ${pal.hair}`}}>
+              {['#','','Team','P','W','D','L','GF','GA','GD','Pts'].map((h,i) => (
+                <th key={i} style={{
+                  fontSize:9, fontWeight:800, letterSpacing:'0.10em',
+                  color:pal.muted, textTransform:'uppercase',
+                  padding:'4px 5px', textAlign:i<3?'left':'center',
+                }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const url = flagUrl(row.team);
+              const advancing = i < 2;
+              return (
+                <tr key={row.team} style={{
+                  borderBottom:`1px solid ${pal.hair}`,
+                  background: advancing
+                    ? isDark?'rgba(200,255,61,0.04)':'rgba(242,100,25,0.03)'
+                    : 'transparent',
+                }}>
+                  <td style={{padding:'7px 5px',fontSize:11,fontWeight:700,
+                    color:advancing?pal.accent:pal.muted,textAlign:'left',width:18}}>
+                    {i+1}
+                  </td>
+                  <td style={{padding:'7px 4px',width:22}}>
+                    {url && <img src={url} alt="" style={{
+                      width:18,height:18,borderRadius:'50%',
+                      objectFit:'cover',display:'block'}}/>}
+                  </td>
+                  <td style={{padding:'7px 5px',fontSize:mobile?11:13,fontWeight:600,
+                    whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
+                    maxWidth:mobile?80:160}}>
+                    {row.team}
+                  </td>
+                  {[row.p,row.w,row.d,row.l,row.gf,row.ga].map((v,j) => (
+                    <td key={j} style={{padding:'7px 5px',fontSize:mobile?11:12,
+                      textAlign:'center',color:pal.muted}}>
+                      {v}
+                    </td>
+                  ))}
+                  <td style={{padding:'7px 5px',fontSize:mobile?11:12,
+                    textAlign:'center',fontWeight:600,
+                    color:row.gd>0?'#4CAF50':row.gd<0?'#FF3B47':pal.muted}}>
+                    {row.gd>0?`+${row.gd}`:row.gd}
+                  </td>
+                  <td style={{padding:'7px 5px',fontSize:mobile?12:14,
+                    textAlign:'center',fontWeight:800,color:pal.accent}}>
+                    {row.pts}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   // ── Views ─────────────────────────────────────────────────────────────────────
   function GroupView() {
     const allGroupMs = MATCHES.filter(m => m.round === 'group');
@@ -897,16 +1057,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     if (group === 'ALL') return <ByDate matches={dateFiltered}/>;
 
     const ms = dateFiltered.filter(m => m.group === group).sort((a,b) => a.iso.localeCompare(b.iso));
-    // Show team names from the full group (not filtered) so chips always appear
-    const allGroupTeams = allGroupMs.filter(m => m.group === group);
-    const teams = [...new Set(allGroupTeams.flatMap(m => [m.home,m.away]))];
     return (
       <>
-        <div style={S.groupTeams}>
-          {teams.map(t => (
-            <div key={t} style={S.groupTeamPill}><span>{t}</span></div>
-          ))}
-        </div>
+        <GroupStandings groupLetter={group} />
         <ByDate matches={ms}/>
       </>
     );
