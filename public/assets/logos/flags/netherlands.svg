@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 314.88 209.77">
+  <!-- Generator: Adobe Illustrator 30.4.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 226)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #dae2e8;
+      }
+
+      .st0, .st1, .st2 {
+        fill-rule: evenodd;
+      }
+
+      .st1 {
+        fill: #ee3124;
+      }
+
+      .st2 {
+        fill: #1c3c8c;
+      }
+    </style>
+  </defs>
+  <polygon class="st1" points="314.92 69.94 314.92 -.11 -.04 -.11 -.04 69.94 314.92 69.94 314.92 69.94"/>
+  <polygon class="st2" points="-.04 139.91 -.04 209.87 314.92 209.87 314.92 139.9 -.04 139.91 -.04 139.91"/>
+  <polygon class="st0" points="314.92 69.94 -.04 69.94 -.04 139.91 314.92 139.91 314.92 69.94 314.92 69.94"/>
+</svg>

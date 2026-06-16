@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 314.88 209.77">
+  <!-- Generator: Adobe Illustrator 30.4.0, SVG Export Plug-In . SVG Version: 2.1.4 Build 226)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #f7e71f;
+      }
+
+      .st0, .st1, .st2 {
+        fill-rule: evenodd;
+      }
+
+      .st2 {
+        fill: #ee3524;
+      }
+    </style>
+  </defs>
+  <polygon class="st2" points="314.91 -.11 210 -.11 210 209.87 314.91 209.87 314.91 -.11 314.91 -.11"/>
+  <polygon class="st0" points="210 209.87 210 -.11 105.02 -.11 105.02 209.87 210 209.87 210 209.87"/>
+  <polygon class="st1" points="20.58 -.11 20.58 -.03 20.58 -.11 -.04 -.11 -.04 209.87 105.02 209.87 105.02 -.11 20.58 -.11 20.58 -.11"/>
+</svg>
