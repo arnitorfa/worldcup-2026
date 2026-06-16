@@ -949,38 +949,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
     return (
       <div style={{padding: mobile?'20px 16px 16px':'24px 32px 20px',
         borderBottom:`1px solid ${pal.hair}`}}>
-        {/* Flag ring */}
-        <div style={{display:'flex', justifyContent:'center', marginBottom:20}}>
-          <div style={{position:'relative', width:cSize, height:cSize}}>
-            {/* Faint dashed ring */}
-            <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,
-              borderRadius:'50%', border:`1px dashed ${pal.hair2}`}}/>
-            {rows.map((row, i) => {
-              const pos = flagPos[i];
-              const url = flagUrl(row.team);
-              return (
-                <div key={row.team} title={row.team} style={{
-                  position:'absolute', top:pos.top, left:pos.left,
-                  width:fSize, height:fSize, borderRadius:'50%',
-                  overflow:'hidden', border:`2px solid ${pal.hair}`,
-                  background:pal.card,
-                  boxShadow:`0 2px 6px rgba(0,0,0,${isDark?0.3:0.12})`,
-                }}>
-                  {url
-                    ? <img src={url} alt={row.team}
-                        style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-                    : <div style={{width:'100%',height:'100%',display:'flex',
-                        alignItems:'center',justifyContent:'center',
-                        fontSize:8,color:pal.muted,fontWeight:800,textAlign:'center'}}>
-                        {row.team.slice(0,3).toUpperCase()}
-                      </div>
-                  }
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Standings table */}
         <table style={{width:'100%',borderCollapse:'collapse'}}>
           <thead>
@@ -1049,14 +1017,15 @@ function WCApp({ mobile, dark, onThemeChange }) {
   function GroupView() {
     const allGroupMs = MATCHES.filter(m => m.round === 'group');
 
-    // Filter by date: finished = strictly before today, default = today and future
-    const dateFiltered = showFinished
-      ? allGroupMs.filter(m => isoDay(m.iso, tz) < today)
-      : allGroupMs.filter(m => isoDay(m.iso, tz) >= today);
+    // Date filter only applies to ALL GROUPS view — specific group shows all matches
+    if (group === 'ALL') {
+      const dateFiltered = showFinished
+        ? allGroupMs.filter(m => isoDay(m.iso, tz) < today)
+        : allGroupMs.filter(m => isoDay(m.iso, tz) >= today);
+      return <ByDate matches={dateFiltered}/>;
+    }
 
-    if (group === 'ALL') return <ByDate matches={dateFiltered}/>;
-
-    const ms = dateFiltered.filter(m => m.group === group).sort((a,b) => a.iso.localeCompare(b.iso));
+    const ms = allGroupMs.filter(m => m.group === group).sort((a,b) => a.iso.localeCompare(b.iso));
     return (
       <>
         <GroupStandings groupLetter={group} />
