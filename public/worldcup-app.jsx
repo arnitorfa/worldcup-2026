@@ -489,6 +489,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const [channelMap, setChannelMap] = React.useState({}); // matchId → 'RÚV' | 'RÚV 2'
   const [bracketMap, setBracketMap] = React.useState({}); // slot → real team name, e.g. "1st A" → "Mexico"
   const [resultsMap, setResultsMap] = React.useState({}); // "2026-06-11T19:00" → { hs, as, status }
+  const [statsData, setStatsData]   = React.useState(null); // { scorers:[], assists:[] }
   const [country, setCountry] = React.useState(() => {
     try {
       const saved = localStorage.getItem('wc_country');
@@ -535,6 +536,14 @@ function WCApp({ mobile, dark, onThemeChange }) {
     // Poll every 2 minutes — Vercel CDN caches 60s when live, 5min otherwise
     const t = setInterval(loadResults, 120000);
     return () => clearInterval(t);
+  }, []);
+
+  // Fetch player stats (top scorers / assists) — cached 30 min server-side
+  React.useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => { if (data.scorers) setStatsData(data); })
+      .catch(() => {});
   }, []);
 
   // Dynamic channel detection from /api/events for near-term dates
@@ -1068,6 +1077,96 @@ function WCApp({ mobile, dark, onThemeChange }) {
     return <ByDate matches={searchRes}/>;
   }
 
+  function StatsView() {
+    if (!statsData) return (
+      <div style={S.emptyMsg}>
+        <div style={{fontWeight:700}}>Loading statistics…</div>
+        <div style={{marginTop:8,fontSize:12,color:pal.muted}}>Stats appear once matches have been played.</div>
+      </div>
+    );
+    if (!statsData.scorers?.length) return (
+      <div style={S.emptyMsg}>
+        <div style={{fontWeight:700}}>No stats available yet</div>
+        <div style={{marginTop:8,fontSize:12,color:pal.muted}}>Check back after the first matches.</div>
+      </div>
+    );
+
+    function PlayerRow({ player, statValue, statLabel, rank }) {
+      const url = flagUrl(player.team);
+      return (
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'28px 48px 1fr auto',
+          gap:mobile?'0 10px':'0 14px',
+          alignItems:'center',
+          padding:mobile?'12px 16px':'14px 32px',
+          borderBottom:`1px solid ${pal.hair}`,
+        }}>
+          {/* Rank */}
+          <div style={{fontSize:13,fontWeight:800,color:rank<=3?pal.accent:pal.muted,
+            fontFamily:'"JetBrains Mono",monospace',textAlign:'center'}}>
+            {rank}
+          </div>
+          {/* Player photo */}
+          <div style={{width:44,height:44,borderRadius:'50%',overflow:'hidden',
+            border:`1px solid ${pal.hair2}`,background:pal.card,flexShrink:0}}>
+            {player.photo
+              ? <img src={player.photo} alt={player.name}
+                  style={{width:'100%',height:'100%',objectFit:'cover'}}
+                  onError={e => { e.target.style.display='none'; }}/>
+              : null}
+          </div>
+          {/* Name + team */}
+          <div style={{minWidth:0}}>
+            <div style={{fontWeight:700,fontSize:mobile?14:15,
+              whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+              {player.name}
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
+              {url && <img src={url} alt={player.team}
+                style={{width:16,height:16,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
+              <span style={{fontSize:11,color:pal.muted,fontWeight:500}}>{player.team}</span>
+            </div>
+          </div>
+          {/* Stat */}
+          <div style={{textAlign:'right',flexShrink:0}}>
+            <div style={{fontSize:mobile?22:26,fontWeight:800,
+              fontFamily:'"JetBrains Mono",monospace',
+              color:pal.accent,lineHeight:1}}>
+              {statValue}
+            </div>
+            <div style={{fontSize:9,fontWeight:700,letterSpacing:'0.10em',
+              color:pal.muted,textTransform:'uppercase',marginTop:2}}>
+              {statLabel}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const sections = [
+      { title:'Top Scorers', icon:'⚽', list:statsData.scorers?.slice(0,5)||[], key:'goals', label:'GOALS' },
+      { title:'Top Assists', icon:'🎯', list:statsData.assists?.slice(0,5)||[], key:'assists', label:'ASSISTS' },
+    ];
+
+    return (
+      <>
+        {sections.map(sec => (
+          <div key={sec.title}>
+            <div style={{...S.sectionHdr, display:'flex', alignItems:'center', gap:8}}>
+              <span>{sec.icon}</span>
+              <span>{sec.title}</span>
+            </div>
+            {sec.list.map((p, i) => (
+              <PlayerRow key={p.name+i} player={p}
+                statValue={p[sec.key]} statLabel={sec.label} rank={i+1}/>
+            ))}
+          </div>
+        ))}
+      </>
+    );
+  }
+
   // ── Live mini card (sidebar) ──────────────────────────────────────────────────
   function LiveMini({ match }) {
     return (
@@ -1212,6 +1311,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
           {id:'today', wk:'Today',        name:String(todayCount||'0'), sub:'MATCHES TODAY'},
           {id:'group', wk:'Group Stage',  name:'72',                    sub:'MATCHES'},
           {id:'ko',    wk:'Knockouts',    name:'32',                    sub:'MATCHES'},
+          {id:'stats', wk:'Statistics',   name:'★',                     sub:'TOP PLAYERS'},
         ].map(rt => {
           const a = tab===rt.id && !searchRes;
           return (
@@ -1288,9 +1388,10 @@ function WCApp({ mobile, dark, onThemeChange }) {
 
         {/* Timeline */}
         <div style={S.timeline}>
-          {searchRes   ? <SearchView/> :
-           tab==='today' ? <TodayView/> :
-           tab==='group' ? <GroupView/> :
+          {searchRes      ? <SearchView/> :
+           tab==='today'  ? <TodayView/> :
+           tab==='group'  ? <GroupView/> :
+           tab==='stats'  ? <StatsView/> :
            <KoView/>}
           <div style={{textAlign:'center',marginTop:32,color:pal.muted,fontSize:11,padding:mobile?'0 16px 16px':'0 32px 16px'}}>
             {(() => {
