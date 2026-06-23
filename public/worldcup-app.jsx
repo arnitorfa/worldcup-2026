@@ -154,6 +154,7 @@ const COUNTRIES = [
   { code:'ca', flag:'🇨🇦', name:'Canada',          station:'CTV / TSN',             tz:'America/Toronto' },
   { code:'hr', flag:'🇭🇷', name:'Croatia',         station:'HRT',                   tz:'Europe/Zagreb' },
   { code:'dk', flag:'🇩🇰', name:'Denmark',         station:'DR / TV 2',             tz:'Europe/Copenhagen' },
+  { code:'fo', flag:'🇫🇴', name:'Faroe Islands',   station:'KVF',                   tz:'Atlantic/Faroe' },
   { code:'fi', flag:'🇫🇮', name:'Finland',         station:'Yle / MTV',             tz:'Europe/Helsinki' },
   { code:'fr', flag:'🇫🇷', name:'France',          station:'M6 / beIN Sports',      tz:'Europe/Paris' },
   { code:'de', flag:'🇩🇪', name:'Germany',         station:'ARD / ZDF',             tz:'Europe/Berlin' },
@@ -177,7 +178,7 @@ const TZ_TO_COUNTRY = {
   'Europe/London':'uk', 'Europe/Belfast':'uk', 'Europe/Guernsey':'uk', 'Europe/Isle_of_Man':'uk', 'Europe/Jersey':'uk',
   'Europe/Stockholm':'se',
   'Europe/Oslo':'no',
-  'Europe/Copenhagen':'dk',
+  'Europe/Copenhagen':'dk', 'Atlantic/Faroe':'fo',
   'Europe/Helsinki':'fi', 'Europe/Mariehamn':'fi',
   'Europe/Berlin':'de', 'Europe/Busingen':'de',
   'Europe/Paris':'fr',
@@ -447,6 +448,7 @@ function getChannel(matchId, country, channelMap) {
   if (country === 'it') return CH.it?.[matchId] || 'DAZN';
   if (country === 'fi') return CH.fi?.[matchId] || 'MTV';
   if (country === 'dk') return CH.dk?.[matchId] || 'DR / TV 2';
+  if (country === 'fo') return 'KVF';
   if (country === 'de') return CH.de?.[matchId] || 'MagentaTV';
   if (country === 'fr') return CH.fr?.[matchId] || 'beIN Sports';
   if (country === 'es') return CH.es?.[matchId] || 'DAZN';
