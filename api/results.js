@@ -4,9 +4,22 @@
 // The API key lives ONLY in the Vercel environment variable FOOTBALL_API_KEY.
 // It is never sent to the browser or included in any client-side code.
 //
-// Returns: { "2026-06-11T19:00": { hs: 2, as: 1, status: "FT" }, ... }
-// Keys are UTC minute-level ISO strings matching our MATCHES[].iso values.
+// Returns: { "2026-06-11T19:00|switzerland": { hs: 2, as: 1, status: "FT" }, ... }
+// Keys are "UTC-minute|normalizedHomeTeam" — handles simultaneous kickoffs in same group.
 // status values: NS (not started) | 1H | HT | 2H | ET | BT | P | FT | AET | PEN
+
+// Normalize a team name so our key matches on both the API side and the frontend side.
+function teamKey(name) {
+  const n = (name || '').toLowerCase()
+    .replace('türkiye', 'turkey')
+    .replace(/côte d.ivoire/i, 'ivory-coast')
+    .replace('korea republic', 'south-korea')
+    .replace('congo dr', 'dr-congo')
+    .replace('bosnia and herzegovina', 'bosnia')
+    .replace('bosnia & herzegovina', 'bosnia')
+    .replace('bosnia-herzegovina', 'bosnia');
+  return n.replace(/[\s]+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+}
 
 const BASE = 'https://v3.football.api-sports.io';
 // FIFA World Cup = league 1 in api-football
@@ -56,8 +69,9 @@ export default async function handler(req, res) {
       const hs = fix.goals?.home;
       const as = fix.goals?.away;
 
-      // Normalize fixture date to UTC minute-level key: "2026-06-11T19:00"
-      const key = new Date(fix.fixture.date).toISOString().slice(0, 16);
+      // Compound key: "2026-06-11T19:00|switzerland" — unique even for simultaneous kickoffs
+      const time = new Date(fix.fixture.date).toISOString().slice(0, 16);
+      const key = `${time}|${teamKey(fix.teams.home.name)}`;
 
       results[key] = { hs, as, status };
 
