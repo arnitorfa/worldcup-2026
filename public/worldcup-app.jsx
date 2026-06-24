@@ -797,7 +797,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const away    = resolveTeam(match.away);
 
     // Result from api-football (via /api/results proxy)
-    const result  = resultsMap[match.iso.slice(0, 16)]; // e.g. { hs:2, as:1, status:"FT" }
+    const result  = getResult(match); // { hs, as, status } — compound key handles simultaneous games
     const LIVE_S  = new Set(['1H','HT','2H','ET','BT','P']);
     const DONE_S  = new Set(['FT','AET','PEN']);
     const hasScore = result && result.hs != null && result.as != null;
@@ -919,6 +919,28 @@ function WCApp({ mobile, dark, onThemeChange }) {
     });
   }
 
+  // ── Result lookup ─────────────────────────────────────────────────────────────
+  // Compound key: "2026-06-24T19:00|switzerland" — matches /api/results format.
+  // Needed because some groups have TWO matches at the exact same kick-off time
+  // (matchday 3 simultaneous games), so a time-only key would be ambiguous.
+  function rKey(teamName) {
+    const n = (teamName || '').toLowerCase()
+      .replace('türkiye', 'turkey')
+      .replace('ivory coast', 'ivory-coast')
+      .replace('south korea', 'south-korea')
+      .replace('dr congo', 'dr-congo')
+      .replace('bosnia-herzegovina', 'bosnia');
+    return n.replace(/[\s]+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+  }
+  function getResult(match) {
+    const time = match.iso.slice(0, 16);
+    // For group matches the home team is real; for knockout rounds use the
+    // resolved team name (resolveTeam is defined below in MatchCard scope,
+    // so here we just use match.home directly — group stage is always real names).
+    const key = `${time}|${rKey(match.home)}`;
+    return resultsMap[key] || resultsMap[time]; // fallback to time-only for safety
+  }
+
   // ── Group standings ───────────────────────────────────────────────────────────
   function computeStandings(groupLetter) {
     const gms = MATCHES.filter(m => m.group === groupLetter);
@@ -926,7 +948,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const st = {};
     teams.forEach(t => { st[t] = {p:0,w:0,d:0,l:0,gf:0,ga:0}; });
     gms.forEach(m => {
-      const r = resultsMap[m.iso.slice(0,16)];
+      const r = getResult(m);
       if (!r || r.hs==null || r.as==null || !['FT','AET','PEN'].includes(r.status)) return;
       const h=m.home, a=m.away;
       st[h].p++; st[a].p++;
