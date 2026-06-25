@@ -9,6 +9,8 @@
 // status values: NS (not started) | 1H | HT | 2H | ET | BT | P | FT | AET | PEN
 
 // Normalize a team name so our key matches on both the API side and the frontend side.
+// api-football sometimes uses different names than our MATCHES array — all aliases
+// must produce the SAME token here and in rKey() in worldcup-app.jsx.
 function teamKey(name) {
   const n = (name || '').toLowerCase()
     .replace('türkiye', 'turkey')
@@ -17,7 +19,10 @@ function teamKey(name) {
     .replace('congo dr', 'dr-congo')
     .replace('bosnia and herzegovina', 'bosnia')
     .replace('bosnia & herzegovina', 'bosnia')
-    .replace('bosnia-herzegovina', 'bosnia');
+    .replace('bosnia-herzegovina', 'bosnia')
+    .replace('czechia', 'czech-republic')   // api-football may use Czechia
+    .replace('united states', 'usa')        // api-football may use United States
+    .replace('cabo verde', 'cape-verde');   // api-football may use Cabo Verde
   return n.replace(/[\s]+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
 }
 
@@ -69,11 +74,15 @@ export default async function handler(req, res) {
       const hs = fix.goals?.home;
       const as = fix.goals?.away;
 
-      // Compound key: "2026-06-11T19:00|switzerland" — unique even for simultaneous kickoffs
+      // Compound key: "2026-06-11T19:00|switzerland" — unique even for simultaneous kickoffs.
+      // Also store a time-only fallback key so that if the team name normalisation
+      // doesn't match (e.g. api-football uses an alias we haven't mapped yet) the
+      // frontend's getResult() fallback can still find the result for solo matches.
       const time = new Date(fix.fixture.date).toISOString().slice(0, 16);
       const key = `${time}|${teamKey(fix.teams.home.name)}`;
 
-      results[key] = { hs, as, status };
+      results[key]  = { hs, as, status }; // compound key — collision-safe
+      results[time] = { hs, as, status }; // time-only fallback — last writer wins for simultaneous games, but frontend prefers compound key
 
       if (LIVE_STATUSES.has(status)) hasLive = true;
     }
