@@ -483,7 +483,10 @@ function matchStatus(iso, round) {
 function WCApp({ mobile, dark, onThemeChange }) {
   const isDark = dark;
 
-  const [tab, setTab]     = React.useState('group');
+  // After group stage ends (June 28) default to knockout view so users see upcoming matches immediately
+  const [tab, setTab]     = React.useState(() =>
+    new Date() >= new Date('2026-06-28T05:00:00Z') ? 'ko' : 'group'
+  );
   const [group, setGroup] = React.useState('ALL');
   const [showFinished, setShowFinished] = React.useState(false);
   const [search, setSearch] = React.useState('');
@@ -1071,16 +1074,40 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const rounds = ['r32','r16','qf','sf','tp','final'];
     const labels = {r32:'Round of 32',r16:'Round of 16',qf:'Quarter-Finals',
       sf:'Semi-Finals',tp:'Third Place',final:'Final'};
-    return rounds.map(r => {
+    const LIVE_S = new Set(['1H','HT','2H','ET','BT','P']);
+    const DONE_S = new Set(['FT','AET','PEN']);
+    const now = new Date();
+
+    // A round is "done" when every match in it is either past its start time
+    // AND has a finished result. Rounds with upcoming or live games float to top.
+    const upcoming = [];
+    const finished = [];
+    rounds.forEach(r => {
       const arr = MATCHES.filter(m => m.round === r).sort((a,b) => a.iso.localeCompare(b.iso));
-      if (!arr.length) return null;
-      return (
-        <div key={r}>
-          <div style={{ ...S.sectionHdr, color:r==='final'?pal.accent:pal.muted }}>{labels[r]}</div>
-          <ByDate matches={arr}/>
-        </div>
-      );
+      if (!arr.length) return;
+      const allDone = arr.every(m => {
+        if (new Date(m.iso) > now) return false; // hasn't started yet
+        const res = getResult(m);
+        return res && DONE_S.has(res.status);
+      });
+      (allDone ? finished : upcoming).push({r, arr});
     });
+
+    const renderRound = ({r, arr}) => (
+      <div key={r}>
+        <div style={{...S.sectionHdr, color:r==='final'?pal.accent:pal.muted}}>{labels[r]}</div>
+        <ByDate matches={arr}/>
+      </div>
+    );
+
+    // Upcoming rounds in chronological order (r32 → final)
+    // Finished rounds in reverse so the most recently completed is closest to upcoming
+    return (
+      <>
+        {upcoming.map(renderRound)}
+        {[...finished].reverse().map(renderRound)}
+      </>
+    );
   }
 
   function TodayView() {
