@@ -83,7 +83,7 @@ const MATCHES = [
   // ROUND OF 32
   mk(73,'2026-06-28T19:00:00Z','2nd A','2nd B',null,'Los Angeles','r32'),
   mk(74,'2026-06-29T20:30:00Z','1st E','Best 3rd (A/B/C/D/F)',null,'Boston','r32'),
-  mk(75,'2026-06-29T21:00:00Z','1st F','2nd C',null,'Monterrey','r32'),
+  mk(75,'2026-06-30T01:00:00Z','1st F','2nd C',null,'Monterrey','r32'),
   mk(76,'2026-06-29T17:00:00Z','1st C','2nd F',null,'Houston','r32'),
   mk(77,'2026-06-30T21:00:00Z','1st I','Best 3rd (C/D/F/G/H)',null,'New York/NJ','r32'),
   mk(78,'2026-06-30T17:00:00Z','2nd E','2nd I',null,'Dallas','r32'),
