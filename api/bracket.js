@@ -17,7 +17,7 @@ const OUR_KO = [
   { id:76,  iso:'2026-06-29T17:00:00Z', home:'1st C',                  away:'2nd F'                     },
   { id:77,  iso:'2026-06-30T21:00:00Z', home:'1st I',                  away:'Best 3rd (C/D/F/G/H)'      },
   { id:78,  iso:'2026-06-30T17:00:00Z', home:'2nd E',                  away:'2nd I'                     },
-  { id:79,  iso:'2026-07-01T02:00:00Z', home:'1st A',                  away:'Best 3rd (C/E/F/H/I)'      },
+  { id:79,  iso:'2026-07-01T01:00:00Z', home:'1st A',                  away:'Best 3rd (C/E/F/H/I)'      },
   { id:80,  iso:'2026-07-01T16:00:00Z', home:'1st L',                  away:'Best 3rd (E/H/I/J/K)'      },
   { id:81,  iso:'2026-07-02T00:00:00Z', home:'1st D',                  away:'Best 3rd (B/E/F/I/J)'      },
   { id:82,  iso:'2026-07-01T20:00:00Z', home:'1st G',                  away:'Best 3rd (A/E/H/I/J)'      },
