@@ -87,7 +87,7 @@ const MATCHES = [
   mk(76,'2026-06-29T17:00:00Z','1st C','2nd F',null,'Houston','r32'),
   mk(77,'2026-06-30T21:00:00Z','1st I','Best 3rd (C/D/F/G/H)',null,'New York/NJ','r32'),
   mk(78,'2026-06-30T17:00:00Z','2nd E','2nd I',null,'Dallas','r32'),
-  mk(79,'2026-07-01T02:00:00Z','1st A','Best 3rd (C/E/F/H/I)',null,'Mexico City','r32'),
+  mk(79,'2026-07-01T01:00:00Z','1st A','Best 3rd (C/E/F/H/I)',null,'Mexico City','r32'),
   mk(80,'2026-07-01T16:00:00Z','1st L','Best 3rd (E/H/I/J/K)',null,'Atlanta','r32'),
   mk(81,'2026-07-02T00:00:00Z','1st D','Best 3rd (B/E/F/I/J)',null,'San Francisco','r32'),
   mk(82,'2026-07-01T20:00:00Z','1st G','Best 3rd (A/E/H/I/J)',null,'Seattle','r32'),
