@@ -13,7 +13,7 @@ const ESPN_SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fi
 const OUR_KO = [
   { id:73,  iso:'2026-06-28T19:00:00Z', home:'2nd A',                  away:'2nd B'                     },
   { id:74,  iso:'2026-06-29T20:30:00Z', home:'1st E',                  away:'Best 3rd (A/B/C/D/F)'      },
-  { id:75,  iso:'2026-06-29T21:00:00Z', home:'1st F',                  away:'2nd C'                     },
+  { id:75,  iso:'2026-06-30T01:00:00Z', home:'1st F',                  away:'2nd C'                     },
   { id:76,  iso:'2026-06-29T17:00:00Z', home:'1st C',                  away:'2nd F'                     },
   { id:77,  iso:'2026-06-30T21:00:00Z', home:'1st I',                  away:'Best 3rd (C/D/F/G/H)'      },
   { id:78,  iso:'2026-06-30T17:00:00Z', home:'2nd E',                  away:'2nd I'                     },
