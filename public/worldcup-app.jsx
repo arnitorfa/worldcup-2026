@@ -807,6 +807,14 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const isFT    = result && DONE_S.has(result.status);
     const isLiveS = result && LIVE_S.has(result.status);
 
+    // Knockout winner highlight — only for non-group finished matches
+    const isKO = !isGroup;
+    const homeWon = isKO && isFT && hasScore && result.hs > result.as;
+    const awayWon = isKO && isFT && hasScore && result.as > result.hs;
+    // homeOpacity/awayOpacity: winner full, loser dimmed, draw/group/unfinished same
+    const homeOp = isFT ? (homeWon ? 1 : awayWon ? 0.35 : 0.65) : 1;
+    const awayOp = isFT ? (awayWon ? 1 : homeWon ? 0.35 : 0.65) : 1;
+
     return (
       <div style={S.evRow}>
         <div style={S.evGrid}>
@@ -873,14 +881,16 @@ function WCApp({ mobile, dark, onThemeChange }) {
             }}>
               {hasScore ? (
                 <>
-                  <span style={{opacity:isFT?0.65:1}}>{home}</span>
+                  <span style={{opacity:homeOp, fontWeight:homeWon?700:undefined}}>{home}</span>
+                  {homeWon && <span style={{color:pal.accent,fontSize:'0.7em',margin:'0 1px 0 3px',verticalAlign:'middle'}}>✓</span>}
                   <span style={{
                     fontFamily:'"JetBrains Mono",monospace',
                     fontWeight:900,
                     color: isLiveS ? '#FF3B47' : pal.fg,
                     padding:'0 4px',
                   }}> {result.hs}–{result.as} </span>
-                  <span style={{opacity:isFT?0.65:1}}>{away}</span>
+                  {awayWon && <span style={{color:pal.accent,fontSize:'0.7em',margin:'0 3px 0 1px',verticalAlign:'middle'}}>✓</span>}
+                  <span style={{opacity:awayOp, fontWeight:awayWon?700:undefined}}>{away}</span>
                 </>
               ) : (
                 <>{home} – {away}</>
