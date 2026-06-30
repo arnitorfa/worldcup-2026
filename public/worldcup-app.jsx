@@ -807,10 +807,18 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const isFT    = result && DONE_S.has(result.status);
     const isLiveS = result && LIVE_S.has(result.status);
 
-    // Knockout winner highlight — only for non-group finished matches
+    // Penalty shootout — when status is PEN the goals (hs/as) are level after ET,
+    // so the winner must be decided by the shootout score (phs/pas from /api/results).
+    const isPen   = result && result.status === 'PEN';
+    const hasPens = isPen && result.phs != null && result.pas != null;
+
+    // Knockout winner highlight — only for non-group finished matches.
+    // For penalty matches compare the shootout score, otherwise the goals.
     const isKO = !isGroup;
-    const homeWon = isKO && isFT && hasScore && result.hs > result.as;
-    const awayWon = isKO && isFT && hasScore && result.as > result.hs;
+    const homeWon = isKO && isFT && hasScore &&
+      (hasPens ? result.phs > result.pas : result.hs > result.as);
+    const awayWon = isKO && isFT && hasScore &&
+      (hasPens ? result.pas > result.phs : result.as > result.hs);
     // homeOpacity/awayOpacity: winner full, loser dimmed, draw/group/unfinished same
     const homeOp = isFT ? (homeWon ? 1 : awayWon ? 0.35 : 0.65) : 1;
     const awayOp = isFT ? (awayWon ? 1 : homeWon ? 0.35 : 0.65) : 1;
@@ -889,6 +897,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
                     color: isLiveS ? '#FF3B47' : pal.fg,
                     padding:'0 4px',
                   }}> {result.hs}–{result.as} </span>
+                  {hasPens && (
+                    <span style={{
+                      fontFamily:'"JetBrains Mono",monospace',
+                      fontSize:'0.72em', fontWeight:700, color:pal.muted,
+                      verticalAlign:'middle', whiteSpace:'nowrap',
+                    }}>(víti {result.phs}–{result.pas}) </span>
+                  )}
                   {awayWon && <span style={{color:pal.accent,fontSize:'0.7em',margin:'0 3px 0 1px',verticalAlign:'middle'}}>✓</span>}
                   <span style={{opacity:awayOp, fontWeight:awayWon?700:undefined}}>{away}</span>
                 </>
