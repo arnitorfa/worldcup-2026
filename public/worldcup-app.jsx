@@ -902,7 +902,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
                       fontFamily:'"JetBrains Mono",monospace',
                       fontSize:'0.72em', fontWeight:700, color:pal.muted,
                       verticalAlign:'middle', whiteSpace:'nowrap',
-                    }}>(víti {result.phs}–{result.pas}) </span>
+                    }}>(penalties {result.phs}–{result.pas}) </span>
                   )}
                   {awayWon && <span style={{color:pal.accent,fontSize:'0.7em',margin:'0 3px 0 1px',verticalAlign:'middle'}}>✓</span>}
                   <span style={{opacity:awayOp, fontWeight:awayWon?700:undefined}}>{away}</span>
