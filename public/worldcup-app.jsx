@@ -1104,22 +1104,22 @@ function WCApp({ mobile, dark, onThemeChange }) {
       sf:'Semi-Finals',tp:'Third Place',final:'Final'};
     const DONE_S = new Set(['FT','AET','PEN']);
 
-    // "More than one day old" = finished AND played before yesterday (local date).
-    // Such matches are hidden under the FINISHED button so the timeline stays current.
-    const yest = new Date();
-    yest.setDate(yest.getDate() - 1);
-    const cutoff = yest.toLocaleDateString('sv-SE', { timeZone: tz }); // yesterday, YYYY-MM-DD
+    // A match moves to FINISHED once more than one day (24h) has passed since
+    // kick-off. Until then it stays in the CURRENT view, so yesterday's games sit
+    // at the top and only drop off a day after they were played.
+    const DAY_MS = 86400000;
+    const now = Date.now();
     const isArchived = (m) => {
       const res = getResult(m);
       if (!res || !DONE_S.has(res.status)) return false;
-      return isoDay(m.iso, tz) < cutoff; // strictly before yesterday → 2+ days old
+      return (now - new Date(m.iso).getTime()) > DAY_MS;
     };
 
-    // Within each round show newest match first (desc); empty rounds are skipped.
-    const renderRound = ({r, arr}) => (
+    // desc=false → chronological (oldest visible match on top); empty rounds skipped.
+    const renderRound = ({r, arr}, desc) => (
       <div key={r}>
         <div style={{...S.sectionHdr, color:r==='final'?pal.accent:pal.muted}}>{labels[r]}</div>
-        <ByDate matches={arr} desc/>
+        <ByDate matches={arr} desc={desc}/>
       </div>
     );
 
@@ -1133,17 +1133,17 @@ function WCApp({ mobile, dark, onThemeChange }) {
       if (!blocks.length) return (
         <div style={S.emptyMsg}><div style={{fontWeight:700}}>No finished matches yet.</div></div>
       );
-      return <>{blocks.reverse().map(renderRound)}</>;
+      return <>{blocks.reverse().map(b => renderRound(b, true))}</>;
     }
 
-    // Default — everything except archived, rounds in order (active round on top),
-    // newest match first within each round.
+    // Default (CURRENT) — everything except archived, rounds in chronological order,
+    // and chronological within each round so yesterday/today sit above upcoming games.
     const blocks = [];
     rounds.forEach(r => {
       const arr = MATCHES.filter(m => m.round === r && !isArchived(m));
       if (arr.length) blocks.push({ r, arr });
     });
-    return <>{blocks.map(renderRound)}</>;
+    return <>{blocks.map(b => renderRound(b, false))}</>;
   }
 
   function TodayView() {
