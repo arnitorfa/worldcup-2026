@@ -74,6 +74,11 @@ export default async function handler(req, res) {
       const hs = fix.goals?.home;
       const as = fix.goals?.away;
 
+      // Penalty shootout score — api-football exposes it in score.penalty.
+      // Only present when a knockout match was decided on penalties (status PEN).
+      const phs = fix.score?.penalty?.home;
+      const pas = fix.score?.penalty?.away;
+
       // Compound key: "2026-06-11T19:00|switzerland" — unique even for simultaneous kickoffs.
       // Also store a time-only fallback key so that if the team name normalisation
       // doesn't match (e.g. api-football uses an alias we haven't mapped yet) the
@@ -81,8 +86,14 @@ export default async function handler(req, res) {
       const time = new Date(fix.fixture.date).toISOString().slice(0, 16);
       const key = `${time}|${teamKey(fix.teams.home.name)}`;
 
-      results[key]  = { hs, as, status }; // compound key — collision-safe
-      results[time] = { hs, as, status }; // time-only fallback — last writer wins for simultaneous games, but frontend prefers compound key
+      const rec = { hs, as, status };
+      if (status === 'PEN' && phs != null && pas != null) {
+        rec.phs = phs; // penalty shootout goals — home
+        rec.pas = pas; // penalty shootout goals — away
+      }
+
+      results[key]  = rec; // compound key — collision-safe
+      results[time] = rec; // time-only fallback — last writer wins for simultaneous games, but frontend prefers compound key
 
       if (LIVE_STATUSES.has(status)) hasLive = true;
     }
