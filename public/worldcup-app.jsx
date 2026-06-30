@@ -926,7 +926,8 @@ function WCApp({ mobile, dark, onThemeChange }) {
   }
 
   // ── Group by date helper ──────────────────────────────────────────────────────
-  function ByDate({ matches }) {
+  // desc=true → newest date first, and newest match first within each date.
+  function ByDate({ matches, desc }) {
     if (!matches.length) return (
       <div style={S.emptyMsg}>
         <div style={{fontWeight:700}}>No matches found.</div>
@@ -934,8 +935,10 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
     const byDate = {};
     matches.forEach(m => { const d=isoDay(m.iso,tz); if(!byDate[d])byDate[d]=[]; byDate[d].push(m); });
-    return Object.entries(byDate).sort().map(([d,arr]) => {
-      arr.sort((a,b) => a.iso.localeCompare(b.iso));
+    let entries = Object.entries(byDate).sort();
+    if (desc) entries = entries.reverse();
+    return entries.map(([d,arr]) => {
+      arr.sort((a,b) => desc ? b.iso.localeCompare(a.iso) : a.iso.localeCompare(b.iso));
       // Use the earliest match in the group to label the date header (correct local date)
       const firstByLocalTime = arr.reduce((a,b) => new Date(a.iso) < new Date(b.iso) ? a : b);
       return (
@@ -1099,40 +1102,48 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const rounds = ['r32','r16','qf','sf','tp','final'];
     const labels = {r32:'Round of 32',r16:'Round of 16',qf:'Quarter-Finals',
       sf:'Semi-Finals',tp:'Third Place',final:'Final'};
-    const LIVE_S = new Set(['1H','HT','2H','ET','BT','P']);
     const DONE_S = new Set(['FT','AET','PEN']);
-    const now = new Date();
 
-    // A round is "done" when every match in it is either past its start time
-    // AND has a finished result. Rounds with upcoming or live games float to top.
-    const upcoming = [];
-    const finished = [];
-    rounds.forEach(r => {
-      const arr = MATCHES.filter(m => m.round === r).sort((a,b) => a.iso.localeCompare(b.iso));
-      if (!arr.length) return;
-      const allDone = arr.every(m => {
-        if (new Date(m.iso) > now) return false; // hasn't started yet
-        const res = getResult(m);
-        return res && DONE_S.has(res.status);
-      });
-      (allDone ? finished : upcoming).push({r, arr});
-    });
+    // "More than one day old" = finished AND played before yesterday (local date).
+    // Such matches are hidden under the FINISHED button so the timeline stays current.
+    const yest = new Date();
+    yest.setDate(yest.getDate() - 1);
+    const cutoff = yest.toLocaleDateString('sv-SE', { timeZone: tz }); // yesterday, YYYY-MM-DD
+    const isArchived = (m) => {
+      const res = getResult(m);
+      if (!res || !DONE_S.has(res.status)) return false;
+      return isoDay(m.iso, tz) < cutoff; // strictly before yesterday → 2+ days old
+    };
 
+    // Within each round show newest match first (desc); empty rounds are skipped.
     const renderRound = ({r, arr}) => (
       <div key={r}>
         <div style={{...S.sectionHdr, color:r==='final'?pal.accent:pal.muted}}>{labels[r]}</div>
-        <ByDate matches={arr}/>
+        <ByDate matches={arr} desc/>
       </div>
     );
 
-    // Upcoming rounds in chronological order (r32 → final)
-    // Finished rounds in reverse so the most recently completed is closest to upcoming
-    return (
-      <>
-        {upcoming.map(renderRound)}
-        {[...finished].reverse().map(renderRound)}
-      </>
-    );
+    if (showFinished) {
+      // Archived matches only — most recent round first, newest match on top.
+      const blocks = [];
+      rounds.forEach(r => {
+        const arr = MATCHES.filter(m => m.round === r && isArchived(m));
+        if (arr.length) blocks.push({ r, arr });
+      });
+      if (!blocks.length) return (
+        <div style={S.emptyMsg}><div style={{fontWeight:700}}>No finished matches yet.</div></div>
+      );
+      return <>{blocks.reverse().map(renderRound)}</>;
+    }
+
+    // Default — everything except archived, rounds in order (active round on top),
+    // newest match first within each round.
+    const blocks = [];
+    rounds.forEach(r => {
+      const arr = MATCHES.filter(m => m.round === r && !isArchived(m));
+      if (arr.length) blocks.push({ r, arr });
+    });
+    return <>{blocks.map(renderRound)}</>;
   }
 
   function TodayView() {
@@ -1256,8 +1267,8 @@ function WCApp({ mobile, dark, onThemeChange }) {
             <span style={S.liveDotEl}/>LIVE
           </div>
         </div>
-        <div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{match.home}</div>
-        <div style={{fontWeight:700,fontSize:13,marginBottom:6}}>{match.away}</div>
+        <div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{resolveTeam(match.home)}</div>
+        <div style={{fontWeight:700,fontSize:13,marginBottom:6}}>{resolveTeam(match.away)}</div>
         <div style={{fontSize:10,color:pal.muted}}>📍 {match.venue}</div>
       </div>
     );
@@ -1376,7 +1387,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
           <span style={{width:8,height:8,borderRadius:'50%',background:'#FF3B47',
             display:'inline-block',flexShrink:0,animation:'ifPulse 1.4s ease-in-out infinite'}}/>
           <span style={{fontSize:12,fontWeight:700,color:'#FF3B47'}}>
-            LIVE: {liveMs.map(m => `${m.home} – ${m.away}`).join('  ·  ')}
+            LIVE: {liveMs.map(m => `${resolveTeam(m.home)} – ${resolveTeam(m.away)}`).join('  ·  ')}
           </span>
         </div>
       )}
@@ -1391,7 +1402,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
         ].map(rt => {
           const a = tab===rt.id && !searchRes;
           return (
-            <button key={rt.id} style={S.roundTab(a)} onClick={() => {setTab(rt.id); setSearch('');}}>
+            <button key={rt.id} style={S.roundTab(a)} onClick={() => {setTab(rt.id); setSearch(''); setShowFinished(false);}}>
               <div style={S.rtWk(a)}>{rt.wk}</div>
               <div style={S.rtName}>{rt.name}</div>
               <div style={S.rtSub(a)}>{rt.sub}</div>
@@ -1429,6 +1440,22 @@ function WCApp({ mobile, dark, onThemeChange }) {
         </div>
       )}
 
+      {/* KNOCKOUT BAR — toggle between current/upcoming and older finished matches */}
+      {tab==='ko' && !searchRes && (
+        <div style={S.groupBar} data-sh>
+          <button style={S.allarChip(!showFinished)}
+            onClick={() => setShowFinished(false)}>CURRENT</button>
+          <button style={{
+            ...S.allarChip(showFinished),
+            borderColor: showFinished ? (isDark?'#7B7B82':'#76736C') : undefined,
+            background: showFinished ? (isDark?'rgba(123,123,130,0.18)':'rgba(118,115,108,0.15)') : 'transparent',
+            color: pal.muted,
+          }} onClick={() => setShowFinished(true)}>
+            FINISHED
+          </button>
+        </div>
+      )}
+
       {/* BODY */}
       <div style={S.body}>
         {/* Desktop live pane */}
@@ -1451,8 +1478,8 @@ function WCApp({ mobile, dark, onThemeChange }) {
                   <div key={m.id} style={{...S.liveMiniCard,marginBottom:6}}>
                     <div style={{fontWeight:700,fontSize:14,fontFamily:'"JetBrains Mono",monospace',marginBottom:4}}>{fmt24(m.iso,tz)}</div>
                     {m.group && <div style={{fontSize:10,color:pal.muted,fontWeight:700,marginBottom:6}}>GROUP {m.group}</div>}
-                    <div style={{fontWeight:700,fontSize:12,marginBottom:2}}>{m.home}</div>
-                    <div style={{fontWeight:700,fontSize:12,marginBottom:4}}>{m.away}</div>
+                    <div style={{fontWeight:700,fontSize:12,marginBottom:2}}>{resolveTeam(m.home)}</div>
+                    <div style={{fontWeight:700,fontSize:12,marginBottom:4}}>{resolveTeam(m.away)}</div>
                     <div style={{fontSize:10,color:pal.muted}}>📍 {m.venue}</div>
                   </div>
                 ))}
