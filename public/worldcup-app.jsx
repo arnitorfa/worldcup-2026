@@ -897,13 +897,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
                     color: isLiveS ? '#FF3B47' : pal.fg,
                     padding:'0 4px',
                   }}> {result.hs}–{result.as} </span>
-                  {hasPens && (
-                    <span style={{
-                      fontFamily:'"JetBrains Mono",monospace',
-                      fontSize:'0.72em', fontWeight:700, color:pal.muted,
-                      verticalAlign:'middle', whiteSpace:'nowrap',
-                    }}>(penalties {result.phs}–{result.pas}) </span>
-                  )}
                   {awayWon && <span style={{color:pal.accent,fontSize:'0.7em',margin:'0 3px 0 1px',verticalAlign:'middle'}}>✓</span>}
                   <span style={{opacity:awayOp, fontWeight:awayWon?700:undefined}}>{away}</span>
                 </>
@@ -911,6 +904,16 @@ function WCApp({ mobile, dark, onThemeChange }) {
                 <>{home} – {away}</>
               )}
             </div>
+            {/* Penalty shootout — own line so it never crowds the score on mobile */}
+            {hasPens && (
+              <div style={{
+                fontFamily:'"JetBrains Mono",monospace',
+                fontSize:mobile?11:12, fontWeight:700, color:pal.muted,
+                marginBottom:3,
+              }}>
+                Penalties {result.phs}–{result.pas}
+              </div>
+            )}
             {/* Subtitle — venue */}
             <div style={S.evSub}>
               <span style={{ color:'#FF3B47', fontSize:11 }}>📍</span>
