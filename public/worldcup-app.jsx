@@ -796,8 +796,6 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const start   = fmt24(match.iso, tz);
     const end     = fmt24(endTime(match.iso, match.round).toISOString(), tz);
     const isGroup = match.round === 'group';
-    const home    = resolveTeam(match.home);
-    const away    = resolveTeam(match.away);
 
     // Result from api-football (via /api/results proxy)
     const result  = getResult(match); // { hs, as, status } — compound key handles simultaneous games
@@ -819,6 +817,13 @@ function WCApp({ mobile, dark, onThemeChange }) {
       (hasPens ? result.phs > result.pas : result.hs > result.as);
     const awayWon = isKO && isFT && hasScore &&
       (hasPens ? result.pas > result.phs : result.as > result.hs);
+
+    // Team names. For knockout matches the schedule holds placeholders ("1st A",
+    // "Best 3rd (…)") that /api/bracket may not have resolved. When the API result
+    // carries the real names, use them — hs/as come from the same record so the
+    // score stays aligned with home/away. Group matches keep their real names.
+    const home = (isKO && result?.home) ? result.home : resolveTeam(match.home);
+    const away = (isKO && result?.away) ? result.away : resolveTeam(match.away);
     // homeOpacity/awayOpacity: winner full, loser dimmed, draw/group/unfinished same
     const homeOp = isFT ? (homeWon ? 1 : awayWon ? 0.35 : 0.65) : 1;
     const awayOp = isFT ? (awayWon ? 1 : homeWon ? 0.35 : 0.65) : 1;
