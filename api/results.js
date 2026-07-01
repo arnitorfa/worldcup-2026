@@ -86,7 +86,10 @@ export default async function handler(req, res) {
       const time = new Date(fix.fixture.date).toISOString().slice(0, 16);
       const key = `${time}|${teamKey(fix.teams.home.name)}`;
 
-      const rec = { hs, as, status };
+      // Real team names from the API. For knockout matches our schedule only has
+      // placeholders ("1st A", "Best 3rd (C/E/F/H/I)") and /api/bracket doesn't
+      // always resolve every slot, so the frontend uses these to fill in the names.
+      const rec = { hs, as, status, home: fix.teams.home.name, away: fix.teams.away.name };
       if (status === 'PEN' && phs != null && pas != null) {
         rec.phs = phs; // penalty shootout goals — home
         rec.pas = pas; // penalty shootout goals — away
