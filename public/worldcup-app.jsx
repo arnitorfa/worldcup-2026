@@ -1239,9 +1239,28 @@ function WCApp({ mobile, dark, onThemeChange }) {
       );
     }
 
+    // Goal involvements = goals + assists, merged across both leaderboards by player.
+    const involveMap = {};
+    (statsData.scorers || []).forEach(p => {
+      const k = `${p.name}|${p.team}`;
+      involveMap[k] = { name:p.name, team:p.team, photo:p.photo, goals:p.goals||0, assists:0 };
+    });
+    (statsData.assists || []).forEach(p => {
+      const k = `${p.name}|${p.team}`;
+      if (!involveMap[k]) involveMap[k] = { name:p.name, team:p.team, photo:p.photo, goals:0, assists:0 };
+      involveMap[k].assists = p.assists || 0;
+      if (!involveMap[k].photo) involveMap[k].photo = p.photo;
+    });
+    const involvements = Object.values(involveMap)
+      .map(p => ({ ...p, involvements: p.goals + p.assists }))
+      .sort((a,b) => b.involvements - a.involvements || b.goals - a.goals)
+      .slice(0,5);
+
     const sections = [
       { title:'Top Scorers', icon:'⚽', list:statsData.scorers?.slice(0,5)||[], key:'goals', label:'GOALS' },
       { title:'Top Assists', icon:'🎯', list:statsData.assists?.slice(0,5)||[], key:'assists', label:'ASSISTS' },
+      { title:'Goal Involvements', icon:'🔥', list:involvements, key:'involvements',
+        label:p => `${p.goals}G · ${p.assists}A` },
     ];
 
     return (
@@ -1254,7 +1273,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
             </div>
             {sec.list.map((p, i) => (
               <PlayerRow key={p.name+i} player={p}
-                statValue={p[sec.key]} statLabel={sec.label} rank={i+1}/>
+                statValue={p[sec.key]}
+                statLabel={typeof sec.label === 'function' ? sec.label(p) : sec.label}
+                rank={i+1}/>
             ))}
           </div>
         ))}
