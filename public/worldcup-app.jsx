@@ -785,9 +785,32 @@ function WCApp({ mobile, dark, onThemeChange }) {
     );
   }
 
-  // Resolve bracket placeholder → real team name if known
+  // Locally resolve knockout winners/losers straight from the results feed so that
+  // "W89" / "L89" placeholders advance correctly — including matches decided in
+  // extra time (AET) or on penalties (PEN) — without depending on /api/bracket,
+  // which only propagates winners from regulation-time results.
+  const koResolved = (() => {
+    const map = {};
+    const DONE = new Set(['FT','AET','PEN']);
+    MATCHES.forEach(m => {
+      if (m.round === 'group') return;
+      const r = getResult(m);
+      if (!r || !DONE.has(r.status) || r.hs == null || r.as == null) return;
+      if (!r.home || !r.away) return; // need the real team names from the API
+      const homeWins = (r.status === 'PEN' && r.phs != null && r.pas != null)
+        ? r.phs > r.pas   // decided on penalties
+        : r.hs > r.as;    // regulation or extra-time goals
+      map[`W${m.id}`] = homeWins ? r.home : r.away;
+      map[`L${m.id}`] = homeWins ? r.away : r.home;
+    });
+    return map;
+  })();
+
+  // Resolve a placeholder → real team name. Locally-computed knockout winners take
+  // precedence (authoritative, results-based), then the /api/bracket map, then the
+  // raw label.
   function resolveTeam(name) {
-    return bracketMap[name] || name;
+    return koResolved[name] || bracketMap[name] || name;
   }
 
   // ── Match card — screenshot layout ───────────────────────────────────────────
