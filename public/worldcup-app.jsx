@@ -821,7 +821,15 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const isGroup = match.round === 'group';
 
     // Result from api-football (via /api/results proxy)
-    const result  = getResult(match); // { hs, as, status } — compound key handles simultaneous games
+    let result  = getResult(match); // { hs, as, status } — compound key handles simultaneous games
+    // Knockout fallback: if the time key didn't match (e.g. the API's real kick-off
+    // time drifted from our hardcoded time), look the result up by team pair once we
+    // know both teams. Uses the same normalisation as results.js.
+    if (!result && !isGroup) {
+      const pn = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const a = pn(resolveTeam(match.home)), b = pn(resolveTeam(match.away));
+      if (a && b) result = resultsMap[`p:${a}~${b}`];
+    }
     const LIVE_S  = new Set(['1H','HT','2H','ET','BT','P']);
     const DONE_S  = new Set(['FT','AET','PEN']);
     const hasScore = result && result.hs != null && result.as != null;
