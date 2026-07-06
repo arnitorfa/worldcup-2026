@@ -98,6 +98,17 @@ export default async function handler(req, res) {
       results[key]  = rec; // compound key — collision-safe
       results[time] = rec; // time-only fallback — last writer wins for simultaneous games, but frontend prefers compound key
 
+      // Team-pair keys (order-independent, time-independent). Knockout matches in the
+      // schedule only carry placeholders and rely on the time key, so if the API's
+      // real kick-off time drifts from our hardcoded time the result goes missing.
+      // Once the frontend knows both teams it can look the result up by pair instead.
+      const pn = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const ph_ = pn(fix.teams.home.name), pa_ = pn(fix.teams.away.name);
+      if (ph_ && pa_) {
+        results[`p:${ph_}~${pa_}`] = rec;
+        results[`p:${pa_}~${ph_}`] = rec;
+      }
+
       if (LIVE_STATUSES.has(status)) hasLive = true;
     }
 
