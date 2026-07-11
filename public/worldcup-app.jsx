@@ -792,17 +792,29 @@ function WCApp({ mobile, dark, onThemeChange }) {
   const koResolved = (() => {
     const map = {};
     const DONE = new Set(['FT','AET','PEN']);
-    MATCHES.forEach(m => {
-      if (m.round === 'group') return;
-      const r = getResult(m);
-      if (!r || !DONE.has(r.status) || r.hs == null || r.as == null) return;
-      if (!r.home || !r.away) return; // need the real team names from the API
-      const homeWins = (r.status === 'PEN' && r.phs != null && r.pas != null)
-        ? r.phs > r.pas   // decided on penalties
-        : r.hs > r.as;    // regulation or extra-time goals
-      map[`W${m.id}`] = homeWins ? r.home : r.away;
-      map[`L${m.id}`] = homeWins ? r.away : r.home;
-    });
+    const pn = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    // Resolve a slot from what we've computed so far (earlier rounds) or the bracket map.
+    const resolveSlot = (name) => map[name] || bracketMap[name] || name;
+    // Process in ascending id order so a match's source winners (lower ids) are known
+    // before we resolve the match that depends on them.
+    MATCHES.filter(m => m.round !== 'group')
+      .sort((a, b) => a.id - b.id)
+      .forEach(m => {
+        let r = getResult(m);
+        // Fallback: time key missed (kick-off time drift) — look up by team pair once
+        // both teams are known, same as MatchCard does.
+        if (!r) {
+          const a = pn(resolveSlot(m.home)), b = pn(resolveSlot(m.away));
+          if (a && b) r = resultsMap[`p:${a}~${b}`];
+        }
+        if (!r || !DONE.has(r.status) || r.hs == null || r.as == null) return;
+        if (!r.home || !r.away) return; // need the real team names from the API
+        const homeWins = (r.status === 'PEN' && r.phs != null && r.pas != null)
+          ? r.phs > r.pas   // decided on penalties
+          : r.hs > r.as;    // regulation or extra-time goals
+        map[`W${m.id}`] = homeWins ? r.home : r.away;
+        map[`L${m.id}`] = homeWins ? r.away : r.home;
+      });
     return map;
   })();
 
