@@ -825,6 +825,20 @@ function WCApp({ mobile, dark, onThemeChange }) {
     return koResolved[name] || bracketMap[name] || name;
   }
 
+  // Robust result lookup: time key first, then team pair (handles kick-off time
+  // drift on knockout matches). Use this anywhere a match result is needed so that
+  // scores AND the finished/current split stay consistent. Must be called at render
+  // time (after koResolved is built) — do not call during koResolved construction.
+  function getResultR(match) {
+    let r = getResult(match);
+    if (!r && match.round !== 'group') {
+      const pn = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const a = pn(resolveTeam(match.home)), b = pn(resolveTeam(match.away));
+      if (a && b) r = resultsMap[`p:${a}~${b}`];
+    }
+    return r;
+  }
+
   // ── Match card — screenshot layout ───────────────────────────────────────────
   function MatchCard({ match }) {
     const status  = matchStatus(match.iso, match.round);
@@ -832,16 +846,9 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const end     = fmt24(endTime(match.iso, match.round).toISOString(), tz);
     const isGroup = match.round === 'group';
 
-    // Result from api-football (via /api/results proxy)
-    let result  = getResult(match); // { hs, as, status } — compound key handles simultaneous games
-    // Knockout fallback: if the time key didn't match (e.g. the API's real kick-off
-    // time drifted from our hardcoded time), look the result up by team pair once we
-    // know both teams. Uses the same normalisation as results.js.
-    if (!result && !isGroup) {
-      const pn = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      const a = pn(resolveTeam(match.home)), b = pn(resolveTeam(match.away));
-      if (a && b) result = resultsMap[`p:${a}~${b}`];
-    }
+    // Result from api-football (via /api/results proxy). getResultR falls back to a
+    // team-pair lookup when the hardcoded kick-off time doesn't match the API's.
+    const result = getResultR(match); // { hs, as, status, home, away }
     const LIVE_S  = new Set(['1H','HT','2H','ET','BT','P']);
     const DONE_S  = new Set(['FT','AET','PEN']);
     const hasScore = result && result.hs != null && result.as != null;
@@ -1161,7 +1168,7 @@ function WCApp({ mobile, dark, onThemeChange }) {
     const DAY_MS = 86400000;
     const now = Date.now();
     const isArchived = (m) => {
-      const res = getResult(m);
+      const res = getResultR(m); // robust lookup — otherwise time-drifted matches never archive
       if (!res || !DONE_S.has(res.status)) return false;
       return (now - new Date(m.iso).getTime()) > DAY_MS;
     };
